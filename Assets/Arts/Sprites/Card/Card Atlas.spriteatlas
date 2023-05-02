@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Card Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 7a4a1311ac393c44f9ded5ef86fd8178, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: a35fa273b6d49364083b8cec7ebd176d, type: 3}
+  - {fileID: 21300000, guid: 78ca8ec47c6850d4b918b2d1eedbe8ec, type: 3}
+  - {fileID: 21300000, guid: 911996d4f3851e648aafab9e06a5b193, type: 3}
+  - {fileID: 21300000, guid: 4d7ffd057d8182b44af5c6ea2b352e4b, type: 3}
+  - {fileID: 21300000, guid: ebd7aa554d2b85c40b5008a6760ad740, type: 3}
+  - {fileID: 21300000, guid: 2eba393604e43e74db31e19b751e81aa, type: 3}
+  - {fileID: 21300000, guid: fb0aaf977cb19694989571a54378ecf3, type: 3}
+  - {fileID: 21300000, guid: b2bb1ca8c5069944a869d31e72e4919b, type: 3}
+  - {fileID: 21300000, guid: 7a38d5b928cdfc74dac98820ac69b0fb, type: 3}
+  - {fileID: 21300000, guid: 254d351b8249bcb4ebadcca48192ce4a, type: 3}
+  - {fileID: 21300000, guid: 4e53a67b1b50a6f4195f8be3e5fd369e, type: 3}
+  - {fileID: 21300000, guid: 0f60ca9c72284b64ebfde7412cd93525, type: 3}
+  - {fileID: 21300000, guid: 7ee8e3cd0d0665c4c9ee58ba662dd411, type: 3}
+  - {fileID: 21300000, guid: 375f483f06b2d8a43a285723690da282, type: 3}
+  - {fileID: 21300000, guid: 56776a3fb8e4c2c40958702ccefd80d5, type: 3}
+  - {fileID: 21300000, guid: fef2d0af13ade4b4aa825348d4f1ac81, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - "\uBDD8\uB4E0"
+  - "\uC544\uC6B0\uD504\uC288\uD2B8\uB77C\uC5D0\uCCB8"
+  - "\uB450\uD788\uBCA1\uC140"
+  - "\uD06C\uB7FC\uD504\uD558\uC6B0"
+  - "\uC874\uD558\uC6B0"
+  - "\uB4C0\uD50C\uB9AC\uC5D0\uB80C"
+  - "\uBBF8\uD2C0\uD558\uC6B0"
+  - "\uC874\uD6D7"
+  - "\uC988\uBC84\uD06C\uD558\uC6B0"
+  - "\uD558\uD504\uC18C\uB529"
+  - "\uC0E4\uC774\uD154\uD558\uC6B0"
+  - "\uC274\uD558\uC6B0"
+  - "\uB791\uC5D4\uC624\uD2B8"
+  - Back
+  - "\uD589\uC5D4"
+  - sowrd
+  m_RenderDataMap: {}
+  m_Tag: Card Atlas
+  m_IsVariant: 0
