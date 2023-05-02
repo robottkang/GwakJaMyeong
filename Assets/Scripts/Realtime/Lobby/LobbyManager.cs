@@ -55,13 +55,13 @@ namespace Lobby
 
         public override void OnLeftLobby()
         {
-            PhotonNetwork.Disconnect();
             SceneManager.LoadScene("Ready");
         }
 
         public override void OnDisconnected(DisconnectCause cause)
         {
             SceneManager.LoadScene("Ready");
+            Debug.LogError(cause);
         }
     }
 }

@@ -12,11 +12,19 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
     private TextMeshProUGUI loadingButtonText;
     [SerializeField]
     private Inventory inventory;
+    private bool triesEnteringLobby;
 
-    public void ConnectUsingSettings()
+    private void Awake()
+    {
+        if (!PhotonNetwork.IsConnected) ConnectUsingSettings();
+    }
+
+    public void JoinLobby()
     {
         if (inventory.transform.childCount == 11)
         {
+            triesEnteringLobby = true;
+            
             Room.DeckController.deckList.Clear();
 
             for (int i = 0; i < inventory.transform.childCount; i++)
@@ -26,19 +34,31 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
                 Debug.Log(Room.DeckController.deckList[i]);
 #endif
             }
-            loadingButtonText.text = "Loading...";
-            PhotonNetwork.ConnectUsingSettings();
+
+            if (PhotonNetwork.IsConnected) PhotonNetwork.JoinLobby();
+            else ConnectUsingSettings();
         }
+    }
+
+    private void ConnectUsingSettings()
+    {
+        PhotonNetwork.ConnectUsingSettings();
+        loadingButtonText.text = "Loading...";
     }
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby();
+        loadingButtonText.text = "Press to Enter\nLobby";
+        if (triesEnteringLobby)
+        {
+            PhotonNetwork.JoinLobby();
+        }
     }
     
     public override void OnDisconnected(DisconnectCause cause)
     {
-        loadingButtonText.text = $"{cause}\nRetry";
+        loadingButtonText.text = "Connect Error\nPress To Retry";
+        Debug.LogError(cause);
     }
 
     public override void OnJoinedLobby()
