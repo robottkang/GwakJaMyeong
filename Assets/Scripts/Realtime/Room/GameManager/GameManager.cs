@@ -12,11 +12,12 @@ namespace Room
         public static GameManager gameManager;
 
         [field:SerializeField]public GameObject SowrdCard { get; private set; }
-        [field:SerializeField]public Transform FirstIdeaCardTransform { get; private set; }
-        [field:SerializeField]public Transform SecondIdeaCardTransform { get; private set; }
-        [field:SerializeField]public Transform ThirdIdeaCardTransform { get; private set; }
-        [field:SerializeField]public Transform DeckTransform { get; private set; }
+        [field:SerializeField]public StrategyPlan FirstIdeaCard { get; private set; }
+        [field:SerializeField]public StrategyPlan SecondIdeaCard { get; private set; }
+        [field:SerializeField]public StrategyPlan ThirdIdeaCard { get; private set; }
+        [field:SerializeField]public DeckController DeckObject { get; private set; }
         [field:SerializeField]public Transform DustTransform { get; private set; }
+        [field:SerializeField]public HandController HandObject { get; private set; }
         
         [SerializeField]
         private GameObject playerPrefab;
@@ -46,7 +47,7 @@ namespace Room
 
         public override void OnDisconnected(DisconnectCause cause)
         {
-            SceneManager.LoadScene("Ready");
+            SceneManager.LoadScene(0);
         }
     }
 }
