@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Card;
 
 namespace Room
 {
@@ -14,7 +15,7 @@ namespace Room
         public void AddCard(CardInfo cardInfo)
         {
             var cardObject = ObjectPool.GetObject(handPoolName, handCardPrefab);
-            cardObject.GetComponent<RectTransform>().sizeDelta *= 0.8f;
+            cardObject.GetComponent<RectTransform>().sizeDelta = handCardPrefab.GetComponent<RectTransform>().sizeDelta * 0.8f;
             cardObject.transform.SetParent(transform);
 
             cardObject.GetComponent<DragalbeCard>().CardInfo = cardInfo;
