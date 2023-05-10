@@ -21,7 +21,7 @@ namespace Lobby
         {
             if (createInput.text.Length == 0)
             {;
-                Debug.Log("no room name");
+                Debug.Log("input room code to create");
                 return;
             }
             PhotonNetwork.CreateRoom(createInput.text, new RoomOptions { MaxPlayers = 2 });
@@ -31,7 +31,7 @@ namespace Lobby
         {
             if (joinInput.text.Length == 0)
             {
-                Debug.Log("no room name2");
+                Debug.Log("input room code to join");
                 return;
             }
             PhotonNetwork.JoinRoom(joinInput.text);
@@ -55,12 +55,12 @@ namespace Lobby
 
         public override void OnLeftLobby()
         {
-            SceneManager.LoadScene("Ready");
+            SceneManager.LoadScene(0);
         }
 
         public override void OnDisconnected(DisconnectCause cause)
         {
-            SceneManager.LoadScene("Ready");
+            SceneManager.LoadScene(0);
             Debug.LogError(cause);
         }
     }
