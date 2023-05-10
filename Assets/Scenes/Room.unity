@@ -412,11 +412,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b5e18311edeae94191495eba443be9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vomTag: {fileID: 631001318}
-  pflug: {fileID: 701950935}
-  ochs: {fileID: 1689571146}
-  alber: {fileID: 1894339487}
+  postureInfos:
+  - posture: 1
+    postureObject: {fileID: 631001318}
+    startAngle: -30
+    endAngle: 30
+  - posture: 2
+    postureObject: {fileID: 701950935}
+    startAngle: 30
+    endAngle: 60
+  - posture: 4
+    postureObject: {fileID: 1689571146}
+    startAngle: 60
+    endAngle: 120
+  - posture: 8
+    postureObject: {fileID: 1894339487}
+    startAngle: 150
+    endAngle: -150
   postureCard: {fileID: 577921453}
+  availablePosture: -1
 --- !u!135 &525568613
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -587,7 +601,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &631001319
 Transform:
   m_ObjectHideFlags: 0
@@ -935,7 +949,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &701950936
 Transform:
   m_ObjectHideFlags: 0
@@ -2845,7 +2859,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1689571147
 Transform:
   m_ObjectHideFlags: 0
@@ -3055,6 +3069,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1794932236}
   - component: {fileID: 1794932237}
+  - component: {fileID: 1794932238}
   m_Layer: 0
   m_Name: Dust
   m_TagString: Untagged
@@ -3091,6 +3106,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4.46, y: 0, z: 6.5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1794932238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794932235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcfea897d9896ce4280127a30b2e47b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1795851379
 GameObject:
   m_ObjectHideFlags: 0
@@ -3169,7 +3196,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1894339488
 Transform:
   m_ObjectHideFlags: 0
