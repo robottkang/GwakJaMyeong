@@ -1,22 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using EasyButtons;
+using Card;
 
 namespace Room
 {
     public class DeckController : MonoBehaviour
     {
 #if UNITY_EDITOR
-        [Button] private void DrowTest() => Drow();
-        [Button] private void SpawnTestCard()
+        [Button] public void DrowTest() => Drow();
+        [Button] public void SpawnTestCard()
         {
-            for (int i = 0; i < 11; i++)
+            deck = new(deckList);
+            
+            for (int i = 0; i < 11 - deck.Count; i++)
             {
                 deck.Add(new());
             }
+            
             Start();
         }
 #endif
@@ -33,25 +35,14 @@ namespace Room
         
         private void Awake()
         {
+            deck = new(deckList);
+            
             gameManager = GameManager.gameManager;
         }
 
         private void Start()
         {
             Initialize();
-
-            for (int i = 0; i < deck.Count; i++)
-            {
-                CardInfo card = deck[i];
-                Vector3 cardPosition = gameManager.DeckTransform.position + (i + 1) * 0.08f * Vector3.up;
-
-                GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
-                spawnedCard.transform.position = cardPosition;
-                spawnedCard.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-                spawnedCard.GetComponent<CardController>().CardInfo = card;
-
-                cardObjects.Add(spawnedCard);
-            }
 
             Drow(5);
         }
@@ -94,9 +85,26 @@ namespace Room
             }
         }
 
+        public void SpawnCard()
+        {
+            for (int i = 0; i < deck.Count; i++)
+            {
+                CardInfo card = deck[i];
+                Vector3 cardPosition = gameManager.DeckObject.transform.position + (i + 1) * 0.08f * Vector3.up;
+
+                GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
+                spawnedCard.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
+                spawnedCard.GetComponent<IdeaCard>().CardInfo = card;
+
+                cardObjects.Add(spawnedCard);
+            }
+        }
+
         public void Initialize()
         {
-            deck = Shuffle(deckList);
+            deck = Shuffle(deck);
+            
+            SpawnCard();
         }
     }
 }
