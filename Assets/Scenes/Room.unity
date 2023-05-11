@@ -506,17 +506,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8792169126085673438, guid: e45e4776ae3339f45900aa27d9403fb7, type: 3}
   m_PrefabInstance: {fileID: 577921449}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &577921451 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8792169126085673439, guid: e45e4776ae3339f45900aa27d9403fb7, type: 3}
-  m_PrefabInstance: {fileID: 577921449}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &577921453 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4145835395206404586, guid: e45e4776ae3339f45900aa27d9403fb7, type: 3}
   m_PrefabInstance: {fileID: 577921449}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 577921451}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c88835b8271fe4383f22f602a26c0c, type: 3}
@@ -1241,8 +1236,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: -175}
-  m_SizeDelta: {x: 699.99994, y: 83.2}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 83.2}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &723570789
 MonoBehaviour:
@@ -2521,13 +2516,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b675f2bb32756194886ee07716400c23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <SowrdCard>k__BackingField: {fileID: 577921451}
+  <PostureCard>k__BackingField: {fileID: 577921453}
   <FirstIdeaCard>k__BackingField: {fileID: 1433916087}
   <SecondIdeaCard>k__BackingField: {fileID: 1967565614}
   <ThirdIdeaCard>k__BackingField: {fileID: 1061435341}
-  <DeckObject>k__BackingField: {fileID: 1795851381}
-  <DustTransform>k__BackingField: {fileID: 1794932236}
-  <HandObject>k__BackingField: {fileID: 723570790}
+  <DeckController>k__BackingField: {fileID: 1795851381}
+  <DustController>k__BackingField: {fileID: 1794932238}
+  <HandController>k__BackingField: {fileID: 723570790}
   playerPrefab: {fileID: 8391192028655851714, guid: fbd7693dc40a78f4db9ae77cc503c4fb, type: 3}
 --- !u!4 &1464204210
 Transform:

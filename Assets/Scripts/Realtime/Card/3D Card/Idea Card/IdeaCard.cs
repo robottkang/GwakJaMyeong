@@ -31,7 +31,7 @@ namespace Card
 
                 if (value != null)
                 {
-                    cardInfo = CurrentStrategyPlan.PlacedCardInfo;
+                    CardInfo = CurrentStrategyPlan.PlacedCardInfo;
                     CanMove = true;
                 }
             }
@@ -39,7 +39,12 @@ namespace Card
         public CardInfo CardInfo
         {
             get => cardInfo;
-            set => cardInfo = value;
+            set
+            {
+                cardInfo = value;
+                
+                if (value != null) cardSprite.sprite = cardInfo.CardSprite;
+            }
         }
 
         private void Awake()
@@ -47,9 +52,10 @@ namespace Card
             mainCamera = Camera.main;
         }
 
-        private void Start()
+        private void OnDisable()
         {
-            Initialize();
+            CurrentStrategyPlan = null;
+            CanMove = false;
         }
 
         public void SetCardSpriteColor(Color color)
@@ -57,18 +63,11 @@ namespace Card
             cardSprite.color = color;
         }
 
-        public void Initialize()
-        {
-            if (cardInfo != null) cardSprite.sprite = cardInfo.CardSprite;
-        }
-
         private void OnMouseDown()
         {
             if (CanMove)
             {
                 originPosition = transform.position;
-
-                //CurrentStrategyPlan.PlacedCardInfo = null; // 드래그 시작 시 전략 구상을 비움, 나머지 구현은 언젠가
             }
         }
 
@@ -85,7 +84,6 @@ namespace Card
         {
             if (CanMove)
             {
-                CardInfo resultCardInfo;
                 Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field")))
                 {
@@ -93,7 +91,7 @@ namespace Card
                     if ((strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
                     {
                         strategyPlan.PlacedCardInfo = CardInfo;
-                        resultCardInfo = null;
+                        CurrentStrategyPlan.ClearStrategyPlan();
                     }
                     else if (strategyPlan == CurrentStrategyPlan)
                     {
@@ -110,14 +108,10 @@ namespace Card
                 }
                 else
                 {
-                    GameManager.gameManager.HandObject.AddCard(CardInfo);
-                    resultCardInfo = null;
+                    GameManager.gameManager.HandController.AddCard(CardInfo);
+                    CurrentStrategyPlan.ClearStrategyPlan();
+                    SetCardSpriteColor(new Color(1f, 1f, 1f, 1f));
                 }
-
-                CurrentStrategyPlan.PlacedCardInfo = resultCardInfo;
-                CanMove = false;
-                ObjectPool.ReturnObject("Card Pool", gameObject);
-                SetCardSpriteColor(new Color(1f, 1f, 1f, 1f));
             }
         }
     }

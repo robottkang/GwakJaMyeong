@@ -11,13 +11,13 @@ namespace Room
     {
         public static GameManager gameManager;
 
-        [field:SerializeField]public GameObject SowrdCard { get; private set; }
+        [field:SerializeField]public Card.PostureCard PostureCard { get; private set; }
         [field:SerializeField]public StrategyPlan FirstIdeaCard { get; private set; }
         [field:SerializeField]public StrategyPlan SecondIdeaCard { get; private set; }
         [field:SerializeField]public StrategyPlan ThirdIdeaCard { get; private set; }
-        [field:SerializeField]public DeckController DeckObject { get; private set; }
-        [field:SerializeField]public Transform DustTransform { get; private set; }
-        [field:SerializeField]public HandController HandObject { get; private set; }
+        [field:SerializeField]public DeckController DeckController { get; private set; }
+        [field:SerializeField]public DustController DustController { get; private set; }
+        [field:SerializeField]public HandController HandController { get; private set; }
         
         [SerializeField]
         private GameObject playerPrefab;

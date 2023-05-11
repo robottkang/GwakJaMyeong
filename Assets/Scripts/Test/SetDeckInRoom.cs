@@ -15,7 +15,7 @@ public class SetDeckInRoom : MonoBehaviour
         if (Application.isPlaying && Application.isEditor)
         {
             DeckController.deckList = deck;
-            GameManager.gameManager.DeckObject.SpawnTestCard();
+            GameManager.gameManager.DeckController.SpawnTestCard();
         }
     }
 }

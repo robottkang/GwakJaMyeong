@@ -30,14 +30,17 @@ namespace Room
         [SerializeField]
         private HandController handController;
 
+        public List<CardInfo> Deck
+        {
+            get => deck;
+            set => deck = value;
+        }
+
         private readonly string cardPoolName = "Card Pool";
-        private GameManager gameManager;
         
         private void Awake()
         {
             deck = new(deckList);
-            
-            gameManager = GameManager.gameManager;
         }
 
         private void Start()
@@ -79,32 +82,33 @@ namespace Room
                 CardInfo card = deck[deckIndex];
                 handController.AddCard(card);
                 ObjectPool.ReturnObject(cardPoolName, cardObjects[deckIndex]);
+                cardObjects.RemoveAt(deckIndex);
                 deck.RemoveAt(deckIndex);
 
-                count--;
+                count -= 1;
             }
         }
 
-        public void SpawnCard()
+        public void SpawnCard(CardInfo card)
         {
-            for (int i = 0; i < deck.Count; i++)
-            {
-                CardInfo card = deck[i];
-                Vector3 cardPosition = gameManager.DeckObject.transform.position + (i + 1) * 0.08f * Vector3.up;
+            GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
+            cardObjects.Add(spawnedCard);
 
-                GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
-                spawnedCard.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
-                spawnedCard.GetComponent<IdeaCard>().CardInfo = card;
+            Vector3 cardPosition = transform.position + cardObjects.Count * 0.08f * Vector3.up;
 
-                cardObjects.Add(spawnedCard);
-            }
+            spawnedCard.transform.SetParent(transform);
+            spawnedCard.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
+            spawnedCard.GetComponent<IdeaCard>().CardInfo = card;
         }
 
         public void Initialize()
         {
             deck = Shuffle(deck);
-            
-            SpawnCard();
+
+            foreach (var card in deck)
+            {
+                SpawnCard(card);
+            }
         }
     }
 }
