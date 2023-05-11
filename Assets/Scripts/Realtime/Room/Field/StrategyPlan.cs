@@ -16,26 +16,31 @@ namespace Room
             set
             {
                 placedCardInfo = value;
-                
+
                 if (placedCardInfo == null)
                 {
-                    placedCardObject = null;
+                    ClearStrategyPlan();
                     return;
-                }
-                if (placedCardObject != null)
-                {
-                    ObjectPool.ReturnObject("Card Pool", placedCardObject);
                 }
 
                 IdeaCard ideaCard;
                 placedCardObject = ObjectPool.GetObject("Card Pool");
                 (ideaCard = placedCardObject.GetComponent<IdeaCard>()).CurrentStrategyPlan = this;
-                ideaCard.Initialize();
                 ideaCard.SetCardSpriteColor(new Color(1f, 1f, 1f, .5f));
 
                 placedCardObject.transform.SetParent(transform);
                 placedCardObject.transform.SetPositionAndRotation(transform.position + Vector3.up * 0.08f, Quaternion.Euler(0f, 0f, 0f));
             }
+        }
+
+        public void ClearStrategyPlan()
+        {
+            placedCardInfo = null;
+
+            if (placedCardObject != null)
+                ObjectPool.ReturnObject("Card Pool", placedCardObject);
+            placedCardObject.GetComponent<IdeaCard>().SetCardSpriteColor(Color.white);
+            placedCardObject = null;
         }
     }
 }
