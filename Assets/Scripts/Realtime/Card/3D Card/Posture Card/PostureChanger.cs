@@ -35,18 +35,15 @@ public class PostureChanger : MonoBehaviour
 
     private void OnMouseUp()
     {
-        Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit mouseRaycastHit);
+        Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit mouseRaycastHit, Mathf.Infinity, LayerMask.GetMask("Board"));
         
         Vector3 v = mouseRaycastHit.point - transform.position;
-        const int minDistanceToChangePosture = 1;
+        const float minDistanceToChangePosture = 1f;
 
         if (v.magnitude > minDistanceToChangePosture)
         {
             float angle = Vector3.SignedAngle(Vector3.forward, v, Vector3.up);
             SetPosture(angle);
-#if UNITY_EDITOR
-            Debug.Log(angle);
-#endif
         }
 
         foreach (var postureInfo in postureInfos)
