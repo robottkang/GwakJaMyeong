@@ -91,7 +91,7 @@ namespace Room
 
         public void SpawnCard(CardInfo card)
         {
-            GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab, transform);
+            GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
             cardObjects.Add(spawnedCard);
 
             Vector3 cardPosition = transform.position + cardObjects.Count * 0.08f * Vector3.up;
