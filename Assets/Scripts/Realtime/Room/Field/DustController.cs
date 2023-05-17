@@ -33,13 +33,12 @@ namespace Room
             {
                 cardsInDust.Enqueue(strategyPlan[i].PlacedCardInfo);
                 strategyPlan[i].ClearStrategyPlan();
-                GameObject cardObject = ObjectPool.GetObject("Card Pool");
+                GameObject cardObject = ObjectPool.GetObject("Card Pool", transform);
                 cardObjectsInDust.Add(cardObject);
                 
                 Vector3 cardPosition = transform.position + cardsInDust.Count * 0.08f * Vector3.up;
 
                 cardObject.GetComponent<IdeaCard>().CardInfo = cardsInDust.Peek();
-                cardObject.transform.SetParent(transform);
                 cardObject.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 0f));
             }
         }

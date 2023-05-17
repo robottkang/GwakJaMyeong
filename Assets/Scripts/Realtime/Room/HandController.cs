@@ -14,9 +14,8 @@ namespace Room
         
         public void AddCard(CardInfo cardInfo)
         {
-            var cardObject = ObjectPool.GetObject(handPoolName, handCardPrefab);
+            var cardObject = ObjectPool.GetObject(handPoolName, handCardPrefab, transform);
             cardObject.GetComponent<RectTransform>().sizeDelta = handCardPrefab.GetComponent<RectTransform>().sizeDelta * 0.8f;
-            cardObject.transform.SetParent(transform);
 
             cardObject.GetComponent<DragalbeCard>().CardInfo = cardInfo;
         }

@@ -24,11 +24,10 @@ namespace Room
                 }
 
                 IdeaCard ideaCard;
-                placedCardObject = ObjectPool.GetObject("Card Pool");
+                placedCardObject = ObjectPool.GetObject("Card Pool", transform);
                 (ideaCard = placedCardObject.GetComponent<IdeaCard>()).CurrentStrategyPlan = this;
                 ideaCard.SetCardSpriteColor(new Color(1f, 1f, 1f, .5f));
-
-                placedCardObject.transform.SetParent(transform);
+                
                 placedCardObject.transform.SetPositionAndRotation(transform.position + Vector3.up * 0.08f, Quaternion.Euler(0f, 0f, 0f));
             }
         }

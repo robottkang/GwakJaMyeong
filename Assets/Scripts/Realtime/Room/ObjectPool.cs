@@ -25,29 +25,29 @@ namespace Room
         }
 
 
-        public static GameObject GetObject(string poolName)
+        public static GameObject GetObject(string poolName, Transform parent = null)
         {
             ObjectPool pool = objectPoolList[poolName];
 
             if (pool.poolingObjectQueue.Count <= 0) return null;
 
             GameObject poolingObject = pool.poolingObjectQueue.Dequeue();
+            poolingObject.transform.SetParent(parent == null ? pool.transform.parent : parent);
             poolingObject.SetActive(true);
-            poolingObject.transform.SetParent(pool.transform.parent);
 
             return poolingObject;
         }
-        public static GameObject GetObject(string poolName, GameObject prefab)
+        public static GameObject GetObject(string poolName, GameObject prefab, Transform parent = null)
         {
             ObjectPool pool = objectPoolList[poolName];
 
             if (pool.poolingObjectQueue.Count > 0)
             {
-                return GetObject(poolName);
+                return GetObject(poolName, parent);
             }
             else
             {
-                return Instantiate(prefab, pool.transform.parent);
+                return Instantiate(prefab, parent == null ? pool.transform.parent : parent);
             }
         }
 
@@ -55,8 +55,8 @@ namespace Room
         {
             ObjectPool pool = objectPoolList[poolName];
 
-            poolingObject.transform.SetParent(pool.transform);
             poolingObject.SetActive(false);
+            poolingObject.transform.SetParent(pool.transform);
             pool.poolingObjectQueue.Enqueue(poolingObject);
         }
     }

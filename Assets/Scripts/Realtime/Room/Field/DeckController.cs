@@ -91,12 +91,11 @@ namespace Room
 
         public void SpawnCard(CardInfo card)
         {
-            GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
+            GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab, transform);
             cardObjects.Add(spawnedCard);
 
             Vector3 cardPosition = transform.position + cardObjects.Count * 0.08f * Vector3.up;
-
-            spawnedCard.transform.SetParent(transform);
+            
             spawnedCard.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
             spawnedCard.GetComponent<IdeaCard>().CardInfo = card;
         }
