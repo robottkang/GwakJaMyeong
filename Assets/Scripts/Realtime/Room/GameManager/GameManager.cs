@@ -19,46 +19,27 @@ namespace Room
         [field:SerializeField]public DustController DustController { get; private set; }
         [field:SerializeField]public HandController HandController { get; private set; }
 
-        private Page currentPage = Page.Start;
+        private Page currentPage = Page.WaitPlayer;
         [SerializeField]
-        private GameObject playerPrefab;
-        private GameObject player;
+        private GameObject counterField;
 
         public Page CurrentPage
         {
             get => currentPage;
             set
             {
-                switch (value)
-                {
-                    case Page.Start:
-                        currentPage = Page.Start;
-                        break;
-                    case Page.Drow:
-                        currentPage = Page.Drow;
-                        break;
-                    case Page.StrategyPlan:
-                        currentPage = Page.StrategyPlan;
-                        break;
-                    case Page.Duel:
-                        currentPage = Page.Duel;
-                        break;
-                    case Page.End:
-                        currentPage = Page.End;
-                        break;
-                }
+                currentPage = value;
+
+#if UNITY_EDITOR
+                Debug.Log($"--- Current Page: {currentPage} ---");
+#endif
+                PageEventBus.Publish(currentPage);
             }
         }
 
         private void Awake()
         {
             gameManager = this;
-        }
-
-        private void Start()
-        {
-            player = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity);
-            Debug.Log(PhotonNetwork.CurrentRoom);
         }
 
         public void LeftRoom()
@@ -78,15 +59,6 @@ namespace Room
         public override void OnDisconnected(DisconnectCause cause)
         {
             SceneManager.LoadScene(0);
-        }
-
-        public enum Page
-        {
-            Start,
-            Drow,
-            StrategyPlan,
-            Duel,
-            End,
         }
     }
 }
