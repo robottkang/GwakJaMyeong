@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "341188167523",
+    "project_id": "gwakjamyeong",
+    "storage_bucket": "gwakjamyeong.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341188167523:android:40ed6f59da92ba67927556",
+        "android_client_info": {
+          "package_name": "com.Cracker.GwakJaMyeong"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341188167523-b0ftd5kjb81ruqdr7n2483o80d2a3tsq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBW1q7maZ8NNuvEywDpRURfXQ5npZOqgJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341188167523-b0ftd5kjb81ruqdr7n2483o80d2a3tsq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
