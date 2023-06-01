@@ -22,32 +22,53 @@ namespace Room
             Start();
         }
 #endif
-        public static List<CardInfo> deckList = new(11);
-        private List<CardInfo> deck = new(11);
-        private List<GameObject> cardObjects = new(11);
+        [Header("- Reference")]
         [SerializeField]
         private GameObject cardPrefab;
         [SerializeField]
         private HandController handController;
 
-        public List<CardInfo> Deck
-        {
-            get => deck;
-            set => deck = value;
-        }
+        [Header("- Setting")]
+        [SerializeField]
+        private int firstDrowCount = 5;
+        [SerializeField]
+        private int defaultDrowCount = 3;
 
-        private readonly string cardPoolName = "Card Pool";
+        public static List<CardInfo> deckList = new(11);
+        private List<CardInfo> deck = new(11);
+        private List<GameObject> cardObjects = new(11);
+
+        public List<CardInfo> Deck => deck;
+        public int DefaultDrowCount => defaultDrowCount;
+
+        private const string cardPoolName = "Card Pool";
         
         private void Awake()
         {
             deck = new(deckList);
 
-            PageEventBus.Subscribe(Page.Drow, () =>
+            void FirstDrow()
             {
-                Drow(5);
-                PageEventBus.UnsubscribeAll(Page.Drow);
-                PageEventBus.Subscribe(Page.Drow, () => Drow(3));
-            });
+                Drow(firstDrowCount);
+                PageEventBus.Unsubscribe(Page.Drow, FirstDrow);
+                PageEventBus.Subscribe(Page.Drow, BasicDrow);
+            }
+            void BasicDrow()
+            {
+                int deckCount = deck.Count;
+                if (deckCount < defaultDrowCount)
+                {
+                    Drow(defaultDrowCount - deckCount);
+                    GameManager.gameManager.DustController.FillDeck();
+                    Drow(deckCount);
+                }
+                else
+                {
+                    Drow(defaultDrowCount);
+                }
+            }
+
+            PageEventBus.Subscribe(Page.Drow, FirstDrow);
         }
 
         private void Start()
@@ -80,11 +101,20 @@ namespace Room
             return resultCardsList;
         }
 
+        public void ShuffleDeck()
+        {
+            deck = Shuffle(deck);
+        }
+
         public void Drow(int count = 1)
         {
             while (count > 0)
             {
-                if (deck.Count <= 0) return;
+                if (deck.Count <= 0)
+                {
+                    Debug.LogError("You try drowing, but deck is empty.");
+                    return;
+                }
 
                 int deckIndex = deck.Count - 1;
                 CardInfo card = deck[deckIndex];
@@ -97,7 +127,7 @@ namespace Room
             }
         }
 
-        public void SpawnCard(CardInfo card)
+        public void SpawnCard()
         {
             GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
             cardObjects.Add(spawnedCard);
@@ -105,16 +135,16 @@ namespace Room
             Vector3 cardPosition = transform.position + cardObjects.Count * 0.08f * Vector3.up;
             
             spawnedCard.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
-            spawnedCard.GetComponent<IdeaCard>().CardInfo = card;
         }
 
         public void Initialize()
         {
             deck = Shuffle(deck);
 
-            foreach (var card in deck)
+            int deckCount = deck.Count;
+            for (int i = 0; i < deckCount; i++)
             {
-                SpawnCard(card);
+                SpawnCard();
             }
         }
     }
