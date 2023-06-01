@@ -28,8 +28,7 @@ namespace Card
                         transform.rotation = Quaternion.Euler(0, 0, 180);
                         break;
                     default:
-                        Debug.LogError("Invalid Posture");
-                        break;
+                        throw new InvalidOperationException();
                 }
             }
         }

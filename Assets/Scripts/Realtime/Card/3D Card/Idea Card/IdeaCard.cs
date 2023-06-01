@@ -44,6 +44,7 @@ namespace Card
                 cardInfo = value;
                 
                 if (value != null) cardSprite.sprite = cardInfo.CardSprite;
+                else Debug.LogWarning("null is invaild for cardInfo");
             }
         }
 

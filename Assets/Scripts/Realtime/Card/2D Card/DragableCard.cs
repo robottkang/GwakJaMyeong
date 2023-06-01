@@ -22,21 +22,28 @@ namespace Card
             get => cardInfo;
             set
             {
-                if (cardInfo == null) cardInfo = value;
+                cardInfo = value;
+                if (value != null) image.sprite = cardInfo.CardSprite;
+                else Debug.LogWarning("null is invaild for cardInfo");
             }
         }
         protected Vector3 OriginPosition => originPosition;
 
+        protected virtual void Awake()
+        {
+            image = GetComponent<Image>();
+        }
+
         protected virtual void Start()
         {
             targetParent = transform.parent;
-            (image = GetComponent<Image>()).sprite = cardInfo.CardSprite;
+            image.sprite = cardInfo.CardSprite;
         }
 
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             image.raycastTarget = false;
-            transform.SetParent(transform.root);
+            transform.SetParent(transform.parent);
 
             originPosition = transform.position;
             offset = transform.position - Input.mousePosition;
