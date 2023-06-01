@@ -43,7 +43,7 @@ namespace Card
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             image.raycastTarget = false;
-            transform.SetParent(transform.parent);
+            transform.SetParent(transform.parent.parent);
 
             originPosition = transform.position;
             offset = transform.position - Input.mousePosition;
