@@ -41,6 +41,13 @@ namespace Room
         private void Awake()
         {
             deck = new(deckList);
+
+            PageEventBus.Subscribe(Page.Drow, () =>
+            {
+                Drow(5);
+                PageEventBus.UnsubscribeAll(Page.Drow);
+                PageEventBus.Subscribe(Page.Drow, () => Drow(3));
+            });
         }
 
         private void Start()
