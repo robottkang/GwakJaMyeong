@@ -27,6 +27,7 @@ namespace DeckBuilding
             if (inventory.transform.childCount == 11)
             {
                 triesEnteringLobby = true;
+                string debugCardList = "Card list: ";
 
                 Room.DeckController.deckList.Clear();
 
@@ -34,10 +35,12 @@ namespace DeckBuilding
                 {
                     Room.DeckController.deckList.Add(inventory.transform.GetChild(i).GetComponent<DragalbeCard>().CardInfo);
 #if UNITY_EDITOR
-                    Debug.Log(Room.DeckController.deckList[i]);
+                    debugCardList += '\n' + Room.DeckController.deckList[i].CardName;
 #endif
                 }
-
+#if UNITY_EDITOR
+                Debug.Log(debugCardList);
+#endif
                 if (PhotonNetwork.IsConnected) PhotonNetwork.JoinLobby();
                 else ConnectUsingSettings();
             }

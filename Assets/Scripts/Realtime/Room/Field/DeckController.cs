@@ -46,8 +46,6 @@ namespace Room
         private void Start()
         {
             Initialize();
-
-            Drow(5);
         }
 
         /// <summary>
@@ -58,17 +56,20 @@ namespace Room
         public List<CardInfo> Shuffle(List<CardInfo> cards)
         {
             List<CardInfo> resultCardsList = new(cards.Count);
+            string debugCardOrder = "shuffled card: ";
             
             while (cards.Count > 0)
             {
                 int randomIndex = Random.Range(0, cards.Count);
 #if UNITY_EDITOR
-                Debug.Log(cards[randomIndex] + " " + randomIndex);
+                debugCardOrder += "\n(" + cards[randomIndex].CardName + ", " + randomIndex + ")";
 #endif
                 resultCardsList.Add(cards[randomIndex]);
                 cards.RemoveAt(randomIndex);
             }
-            
+#if UNITY_EDITOR
+            Debug.Log(debugCardOrder);
+#endif
             return resultCardsList;
         }
 
