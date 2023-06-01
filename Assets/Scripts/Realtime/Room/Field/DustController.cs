@@ -10,21 +10,26 @@ namespace Room
     {
 #if UNITY_EDITOR
         [Button] private void ClearTest() => ClearStrategyPlans();
-        [Button] private void PassTest() => PassDust2Deck();
+        [Button] private void FillTest() => FillDeck();
 #endif
         private StrategyPlan[] strategyPlan;
         private Queue<CardInfo> cardsInDust = new(9);
         private List<GameObject> cardObjectsInDust = new(9);
 
+        private const string poolName = "Card Pool";
+
         private void Awake()
         {
             GameManager gameManager = GameManager.gameManager;
+
             strategyPlan = new StrategyPlan[3]
             {
                 gameManager.FirstIdeaCard,
                 gameManager.SecondIdeaCard,
                 gameManager.ThirdIdeaCard
             };
+
+            PageEventBus.Subscribe(Page.End, ClearStrategyPlans);
         }
 
         public void ClearStrategyPlans()
@@ -33,7 +38,7 @@ namespace Room
             {
                 cardsInDust.Enqueue(strategyPlan[i].PlacedCardInfo);
                 strategyPlan[i].ClearStrategyPlan();
-                GameObject cardObject = ObjectPool.GetObject("Card Pool", transform);
+                GameObject cardObject = ObjectPool.GetObject(poolName, transform);
                 cardObjectsInDust.Add(cardObject);
                 
                 Vector3 cardPosition = transform.position + cardsInDust.Count * 0.08f * Vector3.up;
@@ -43,7 +48,7 @@ namespace Room
             }
         }
 
-        public void PassDust2Deck()
+        public void FillDeck()
         {
             int cardsInDustCount = cardsInDust.Count;
             DeckController deckController = GameManager.gameManager.DeckController;
@@ -51,12 +56,12 @@ namespace Room
             for (int i = 0; i < cardsInDustCount; i++)
             {
                 CardInfo card = cardsInDust.Dequeue();
-                deckController.SpawnCard(card);
+                deckController.SpawnCard();
                 deckController.Deck.Add(card);
-                ObjectPool.ReturnObject("Card Pool", cardObjectsInDust[i]);
+                ObjectPool.ReturnObject(poolName, cardObjectsInDust[i]);
             }
 
-            deckController.Deck = deckController.Shuffle(deckController.Deck);
+            deckController.ShuffleDeck();
         }
     }
 }
