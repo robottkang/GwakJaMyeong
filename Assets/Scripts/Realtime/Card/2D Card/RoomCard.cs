@@ -1,15 +1,40 @@
 using System.Collections;
-using Room;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Room;
 
 namespace Card
 {
     public class RoomCard : DragalbeCard
     {
+        bool canMove = true;
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            PageEventBus.Subscribe(Page.Duel, () => 
+            {
+                canMove = false;
+            });
+            PageEventBus.Subscribe(Page.End, () =>
+            {
+                canMove = true;
+            });
+        }
+
+        public override void OnBeginDrag(PointerEventData eventData)
+        {
+            if (!canMove) return;
+
+            base.OnBeginDrag(eventData);
+        }
+
         public override void OnEndDrag(PointerEventData eventData)
         {
+            if (!canMove) return;
+
             base.OnEndDrag(eventData);
 
             Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -25,6 +50,13 @@ namespace Card
             {
                 transform.position = OriginPosition;
             }
+        }
+
+        public override void OnDrag(PointerEventData eventData)
+        {
+            if (!canMove) return;
+
+            base.OnDrag(eventData);
         }
     }
 }

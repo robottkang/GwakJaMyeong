@@ -13,7 +13,7 @@ namespace Card
         private SpriteRenderer backgroundSprite;
         [SerializeField]
         private CardInfo cardInfo;
-        private bool CanMove = false;
+        private bool canMove = false;
         private Vector3 originPosition;
         [SerializeField, ReadOnly]
         private StrategyPlan currentStrategyPlan;
@@ -32,7 +32,7 @@ namespace Card
                 if (value != null)
                 {
                     CardInfo = CurrentStrategyPlan.PlacedCardInfo;
-                    CanMove = true;
+                    canMove = true;
                 }
             }
         }
@@ -51,12 +51,17 @@ namespace Card
         private void Awake()
         {
             mainCamera = Camera.main;
+
+            PageEventBus.Subscribe(Page.Duel, () =>
+            {
+                canMove = false;
+            });
         }
 
         private void OnDisable()
         {
             CurrentStrategyPlan = null;
-            CanMove = false;
+            canMove = false;
         }
 
         public void SetCardSpriteColor(Color color)
@@ -66,53 +71,50 @@ namespace Card
 
         private void OnMouseDown()
         {
-            if (CanMove)
-            {
-                originPosition = transform.position;
-            }
+            if (!canMove) return;
+
+            originPosition = transform.position;
         }
 
         private void OnMouseDrag()
         {
-            if (CanMove)
-            {
-                Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Board"));
-                transform.position = hitInfo.point + Vector3.up;
-            }
+            if (!canMove) return;
+
+            Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Board"));
+            transform.position = hitInfo.point + Vector3.up;
         }
 
         private void OnMouseUp()
         {
-            if (CanMove)
+            if (!canMove) return;
+
+            Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field")))
             {
-                Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field")))
+                StrategyPlan strategyPlan;
+                if ((strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
                 {
-                    StrategyPlan strategyPlan;
-                    if ((strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
-                    {
-                        strategyPlan.PlacedCardInfo = CardInfo;
-                        CurrentStrategyPlan.ClearStrategyPlan();
-                    }
-                    else if (strategyPlan == CurrentStrategyPlan)
-                    {
-                        transform.position = originPosition;
-                        return;
-                    }
-                    else // if PlacedCard is not null, trade card <- implement later
-                    {
-                        //resultCardInfo = strategyPlan.PlacedCardInfo;
-                        //strategyPlan.PlacedCardInfo = CardInfo;
-                        transform.position = originPosition;
-                        return;
-                    }
-                }
-                else
-                {
-                    GameManager.gameManager.HandController.AddCard(CardInfo);
+                    strategyPlan.PlacedCardInfo = CardInfo;
                     CurrentStrategyPlan.ClearStrategyPlan();
-                    SetCardSpriteColor(new Color(1f, 1f, 1f, 1f));
                 }
+                else if (strategyPlan == CurrentStrategyPlan)
+                {
+                    transform.position = originPosition;
+                    return;
+                }
+                else // if PlacedCard is not null, trade card <- implement later
+                {
+                    //resultCardInfo = strategyPlan.PlacedCardInfo;
+                    //strategyPlan.PlacedCardInfo = CardInfo;
+                    transform.position = originPosition;
+                    return;
+                }
+            }
+            else
+            {
+                GameManager.gameManager.HandController.AddCard(CardInfo);
+                CurrentStrategyPlan.ClearStrategyPlan();
+                SetCardSpriteColor(new Color(1f, 1f, 1f, 1f));
             }
         }
     }
