@@ -14,13 +14,13 @@ namespace Card
         {
             base.Awake();
 
+            PageEventBus.Subscribe(Page.Drow, () =>
+            {
+                canMove = true;
+            });
             PageEventBus.Subscribe(Page.Duel, () => 
             {
                 canMove = false;
-            });
-            PageEventBus.Subscribe(Page.End, () =>
-            {
-                canMove = true;
             });
         }
 

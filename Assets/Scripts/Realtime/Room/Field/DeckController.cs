@@ -55,17 +55,12 @@ namespace Room
             }
             void BasicDrow()
             {
-                int deckCount = deck.Count;
-                if (deckCount < defaultDrowCount)
+                if (deck.Count < defaultDrowCount)
                 {
-                    Drow(defaultDrowCount - deckCount);
                     GameManager.gameManager.DustController.FillDeck();
-                    Drow(deckCount);
                 }
-                else
-                {
-                    Drow(defaultDrowCount);
-                }
+
+                Drow(defaultDrowCount);
             }
 
             PageEventBus.Subscribe(Page.Drow, FirstDrow);
