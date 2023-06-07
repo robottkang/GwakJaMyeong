@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 121725172}
   m_Layer: 0
-  m_Name: Counter Field
+  m_Name: Opponent Field
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -357,7 +357,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next Page
+  m_text: Start
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2806,7 +2806,7 @@ MonoBehaviour:
   <DeckController>k__BackingField: {fileID: 1795851381}
   <DustController>k__BackingField: {fileID: 1794932238}
   <HandController>k__BackingField: {fileID: 723570790}
-  counterField: {fileID: 0}
+  counterField: {fileID: 121725171}
 --- !u!4 &1464204210
 Transform:
   m_ObjectHideFlags: 0
@@ -3430,6 +3430,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardPrefab: {fileID: 981924963704536803, guid: 971bfffbb47156e4e88304f7ba25a827, type: 3}
   handController: {fileID: 723570790}
+  firstDrowCount: 5
+  defaultDrowCount: 3
 --- !u!65 &1795851382
 BoxCollider:
   m_ObjectHideFlags: 0
