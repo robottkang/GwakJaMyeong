@@ -5,11 +5,11 @@ using UnityEngine.Events;
 
 namespace Room
 {
-    public class PageEventBus : MonoBehaviour
+    public class PhaseEventBus : MonoBehaviour
     {
-        private static readonly IDictionary<Page, UnityEvent> Events = new Dictionary<Page, UnityEvent>();
+        private static readonly IDictionary<Phase, UnityEvent> Events = new Dictionary<Phase, UnityEvent>();
 
-        public static void Subscribe(Page eventType, UnityAction listener)
+        public static void Subscribe(Phase eventType, UnityAction listener)
         {
             UnityEvent thisEvent;
 
@@ -25,7 +25,7 @@ namespace Room
             }
         }
 
-        public static void Unsubscribe(Page type, UnityAction listener)
+        public static void Unsubscribe(Phase type, UnityAction listener)
         {
             UnityEvent thisEvent;
 
@@ -35,7 +35,7 @@ namespace Room
             }
         }
 
-        public static void UnsubscribeAll(Page type)
+        public static void UnsubscribeAll(Phase type)
         {
             UnityEvent thisEvent;
 
@@ -45,7 +45,7 @@ namespace Room
             }
         }
 
-        public static void Publish(Page type)
+        public static void Publish(Phase type)
         {
             UnityEvent thisEvent;
 
@@ -56,7 +56,7 @@ namespace Room
         }
     }
 
-    public enum Page
+    public enum Phase
     {
         WaitPlayer,
         Drow,

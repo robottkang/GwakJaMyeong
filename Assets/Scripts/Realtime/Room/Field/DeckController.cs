@@ -50,8 +50,8 @@ namespace Room
             void FirstDrow()
             {
                 Drow(firstDrowCount);
-                PageEventBus.Unsubscribe(Page.Drow, FirstDrow);
-                PageEventBus.Subscribe(Page.Drow, BasicDrow);
+                PhaseEventBus.Unsubscribe(Phase.Drow, FirstDrow);
+                PhaseEventBus.Subscribe(Phase.Drow, BasicDrow);
             }
             void BasicDrow()
             {
@@ -63,7 +63,7 @@ namespace Room
                 Drow(defaultDrowCount);
             }
 
-            PageEventBus.Subscribe(Page.Drow, FirstDrow);
+            PhaseEventBus.Subscribe(Phase.Drow, FirstDrow);
         }
 
         private void Start()

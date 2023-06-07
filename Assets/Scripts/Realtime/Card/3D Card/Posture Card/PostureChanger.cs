@@ -21,11 +21,11 @@ namespace Room
 
         private void Awake()
         {
-            PageEventBus.Subscribe(Page.StrategyPlan, () =>
+            PhaseEventBus.Subscribe(Phase.StrategyPlan, () =>
             {
                 gameObject.SetActive(true);
             });
-            PageEventBus.Subscribe(Page.Duel, () =>
+            PhaseEventBus.Subscribe(Phase.Duel, () =>
             {
                 gameObject.SetActive(false);
             });

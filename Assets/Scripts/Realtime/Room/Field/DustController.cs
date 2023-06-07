@@ -29,7 +29,7 @@ namespace Room
                 gameManager.ThirdIdeaCard
             };
 
-            PageEventBus.Subscribe(Page.End, ClearStrategyPlans);
+            PhaseEventBus.Subscribe(Phase.End, ClearStrategyPlans);
         }
 
         public void ClearStrategyPlans()

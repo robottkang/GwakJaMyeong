@@ -18,12 +18,13 @@ namespace Room
         [field:SerializeField]public DeckController DeckController { get; private set; }
         [field:SerializeField]public DustController DustController { get; private set; }
         [field:SerializeField]public HandController HandController { get; private set; }
+        public GameObject PlayerObject { get; private set; }
 
-        private Page currentPage = Page.WaitPlayer;
+        private Phase currentPage = Phase.WaitPlayer;
         [SerializeField]
         private GameObject counterField;
 
-        public Page CurrentPage
+        public Phase CurrentPage
         {
             get => currentPage;
             set
@@ -33,13 +34,15 @@ namespace Room
 #if UNITY_EDITOR
                 Debug.Log($"--- Current Page: {currentPage} ---");
 #endif
-                PageEventBus.Publish(currentPage);
+                PhaseEventBus.Publish(currentPage);
             }
         }
 
         private void Awake()
         {
             gameManager = this;
+            
+            PlayerObject = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         }
 
         public void LeftRoom()

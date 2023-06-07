@@ -52,7 +52,7 @@ namespace Card
         {
             mainCamera = Camera.main;
 
-            PageEventBus.Subscribe(Page.Duel, () =>
+            PhaseEventBus.Subscribe(Phase.Duel, () =>
             {
                 canMove = false;
             });
