@@ -8,9 +8,9 @@ namespace Room
 {
     public class PlayerState : MonoBehaviourPun, IPunObservable
     {
-        [HideInInspector]
+        [ReadOnly]
         public bool isReadyToPlay;
-        [HideInInspector]
+        [ReadOnly]
         public bool isMyAttackTurn;
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
