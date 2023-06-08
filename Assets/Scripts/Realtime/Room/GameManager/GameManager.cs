@@ -45,12 +45,12 @@ namespace Room
             PlayerObject = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         }
 
-        public void LeftRoom()
+        public void LeaveRoom()
         {
-            if (PhotonNetwork.IsConnected)
+            if (PhotonNetwork.InRoom)
                 PhotonNetwork.LeaveRoom();
             else
-                SceneManager.LoadScene(0);
+                OnDisconnected(DisconnectCause.ExceptionOnConnect);
         }
 
         public override void OnLeftRoom()
