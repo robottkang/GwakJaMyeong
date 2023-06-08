@@ -24,7 +24,7 @@ namespace Room
         [SerializeField]
         private GameObject counterField;
 
-        public Phase CurrentPage
+        public Phase CurrentPhase
         {
             get => currentPage;
             set

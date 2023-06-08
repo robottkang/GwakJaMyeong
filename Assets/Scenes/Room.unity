@@ -1494,7 +1494,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1464204209}
         m_TargetAssemblyTypeName: Room.GameManager, Assembly-CSharp
-        m_MethodName: LeftRoom
+        m_MethodName: LeaveRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1801,8 +1801,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1060080427}
-        m_TargetAssemblyTypeName: Room.PageChanger, Assembly-CSharp
-        m_MethodName: ChangeNextPage
+        m_TargetAssemblyTypeName: Room.PhaseChanger, Assembly-CSharp
+        m_MethodName: ChangeNextPhase
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

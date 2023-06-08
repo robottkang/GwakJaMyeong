@@ -53,34 +53,34 @@ namespace Room
             
             UniTask.Void(async (CancellationToken cts) =>
             {
-                switch (gameManager.CurrentPage)
+                switch (gameManager.CurrentPhase)
                 {
                     case Phase.WaitPlayer:
                         await WaitPlayer();
                         if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
                         await WaitCoinTossResult();
-                        gameManager.CurrentPage = Phase.Drow;
+                        gameManager.CurrentPhase = Phase.Drow;
                         break;
                     case Phase.Drow:
-                        gameManager.CurrentPage = Phase.StrategyPlan;
+                        gameManager.CurrentPhase = Phase.StrategyPlan;
                         break;
                     case Phase.StrategyPlan:
                         if (gameManager.FirstIdeaCard.PlacedCardInfo == null ||
                             gameManager.SecondIdeaCard.PlacedCardInfo == null ||
                             gameManager.ThirdIdeaCard.PlacedCardInfo == null) return;
-                        gameManager.CurrentPage = Phase.Duel;
+                        gameManager.CurrentPhase = Phase.Duel;
                         break;
                     case Phase.Duel:
-                        gameManager.CurrentPage = Phase.End;
+                        gameManager.CurrentPhase = Phase.End;
                         break;
                     case Phase.End:
-                        gameManager.CurrentPage = Phase.Drow;
+                        gameManager.CurrentPhase = Phase.Drow;
                         break;
                 }
             }, ctsHasOpponent.Token);
 
             canPassNextPhase = true;
-            text.text = gameManager.CurrentPage.ToString();
+            text.text = gameManager.CurrentPhase.ToString();
         }
 
         public async UniTask WaitPlayer()
