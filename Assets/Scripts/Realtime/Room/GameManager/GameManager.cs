@@ -45,6 +45,11 @@ namespace Room
             PlayerObject = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         }
 
+        private void Start()
+        {
+            Debug.Log(PhotonNetwork.CurrentRoom.ToString());
+        }
+
         public void LeaveRoom()
         {
             if (PhotonNetwork.InRoom)

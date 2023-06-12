@@ -14,7 +14,7 @@ namespace Room
         [Space]
         [SerializeField]
         private PostureCard postureCard;
-        //[HideInInspector]
+        [ReadOnly]
         public Posture availablePosture;
 
         private Camera mainCamera;
