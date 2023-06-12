@@ -21,8 +21,7 @@ namespace Room
         private int countOfPlayers = -1;
         private bool canPassNextPhase = true;
 
-        private CancellationTokenSource ctsTimeout = new();
-        private CancellationTokenSource ctsHasOpponent = new();
+        private CancellationTokenSource ctsChangePhase = new();
 
         private void Awake()
         {
@@ -44,6 +43,11 @@ namespace Room
             }
         }
 
+        private void OnDestroy()
+        {
+            ctsChangePhase.Cancel();
+        }
+
         public void ChangeNextPhase()
         {
             if (!canPassNextPhase) return;
@@ -56,9 +60,8 @@ namespace Room
                 switch (gameManager.CurrentPhase)
                 {
                     case Phase.WaitPlayer:
-                        await WaitPlayer();
+                        await WaitPlayer(cts);
                         if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
-                        await WaitCoinTossResult();
                         gameManager.CurrentPhase = Phase.Drow;
                         break;
                     case Phase.Drow:
@@ -77,13 +80,13 @@ namespace Room
                         gameManager.CurrentPhase = Phase.Drow;
                         break;
                 }
-            }, ctsHasOpponent.Token);
+            }, ctsChangePhase.Token);
 
             canPassNextPhase = true;
             text.text = gameManager.CurrentPhase.ToString();
         }
 
-        public async UniTask WaitPlayer()
+        public async UniTask WaitPlayer(CancellationToken cts)
         {
             text.text = "Wait Player";
             myPlayerState.isReadyToPlay = true;
@@ -93,17 +96,18 @@ namespace Room
             {
                 if (playerStates.Length == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
                 {
-                    Debug.Log("Pass");
+                    Debug.Log("All Player is connected");
+                    thisButton.onClick.RemoveListener(StopWaitingPlayer);
                     return;
                 }
-                await UniTask.Yield(ctsHasOpponent.Token);
+                await UniTask.Yield(cts);
             }
         }
 
         public void StopWaitingPlayer()
         {
-            ctsHasOpponent.Cancel();
-            ctsHasOpponent = new();
+            ctsChangePhase.Cancel();
+            ctsChangePhase = new();
             thisButton.onClick.RemoveListener(StopWaitingPlayer);
 
             myPlayerState.isReadyToPlay = false;
@@ -113,38 +117,12 @@ namespace Room
 
         public void ExecuteCoinToss()
         {
-            bool coin = UnityEngine.Random.Range(0, 2) > 0; // true is first
+            bool coin = UnityEngine.Random.Range(0, 2) > 0;
 
             foreach (var player in playerStates)
             {
                 player.isMyAttackTurn = coin;
                 coin = !coin;
-            }
-        }
-
-        public async UniTask WaitCoinTossResult()
-        {
-            text.text = "coin toss";
-            thisButton.onClick.RemoveListener(StopWaitingPlayer);
-
-            ctsTimeout = new();
-            ctsTimeout.CancelAfter(TimeSpan.FromSeconds(15));
-
-            try
-            {
-                while (true)
-                {
-                    if (playerStates[0].isMyAttackTurn ^ playerStates[1].isMyAttackTurn) return;
-
-                    await UniTask.Yield(ctsTimeout.Token);
-                }
-            }
-            catch (OperationCanceledException ex)
-            {
-                if (ctsTimeout.Token == ex.CancellationToken)
-                {
-                    Debug.Log(ex.Message);
-                }
             }
         }
     }
