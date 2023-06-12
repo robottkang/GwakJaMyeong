@@ -27,18 +27,19 @@ namespace DeckBuilding
             if (inventory.transform.childCount == 11)
             {
                 triesEnteringLobby = true;
-                string debugCardList = "Card list: ";
 
                 Room.DeckController.deckList.Clear();
 
                 for (int i = 0; i < inventory.transform.childCount; i++)
                 {
                     Room.DeckController.deckList.Add(inventory.transform.GetChild(i).GetComponent<DragalbeCard>().CardInfo);
-#if UNITY_EDITOR
-                    debugCardList += '\n' + Room.DeckController.deckList[i].CardName;
-#endif
                 }
 #if UNITY_EDITOR
+                string debugCardList = "Card list: ";
+                foreach (var card in Room.DeckController.deckList)
+                {
+                    debugCardList += '\n' + card.CardName;
+                }
                 Debug.Log(debugCardList);
 #endif
                 if (PhotonNetwork.IsConnected) PhotonNetwork.JoinLobby();

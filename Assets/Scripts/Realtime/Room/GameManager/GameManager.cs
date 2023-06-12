@@ -24,7 +24,7 @@ namespace Room
         [SerializeField]
         private GameObject counterField;
 
-        public Phase CurrentPage
+        public Phase CurrentPhase
         {
             get => currentPage;
             set
@@ -45,12 +45,17 @@ namespace Room
             PlayerObject = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         }
 
-        public void LeftRoom()
+        private void Start()
         {
-            if (PhotonNetwork.IsConnected)
+            Debug.Log(PhotonNetwork.CurrentRoom.ToString());
+        }
+
+        public void LeaveRoom()
+        {
+            if (PhotonNetwork.InRoom)
                 PhotonNetwork.LeaveRoom();
             else
-                SceneManager.LoadScene(0);
+                OnDisconnected(DisconnectCause.ExceptionOnConnect);
         }
 
         public override void OnLeftRoom()

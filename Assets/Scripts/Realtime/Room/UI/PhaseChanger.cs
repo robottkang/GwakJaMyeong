@@ -7,6 +7,7 @@ using Photon.Pun;
 using TMPro;
 using System;
 using System.Threading;
+using Photon.Realtime;
 
 namespace Room
 {
@@ -16,9 +17,11 @@ namespace Room
         private TextMeshProUGUI text;
         private Button thisButton;
         PlayerState[] playerStates;
+        PlayerState myPlayerState;
+        private int countOfPlayers = -1;
+        private bool canPassNextPhase = true;
 
-        private CancellationTokenSource ctsTimeout = new();
-        private CancellationTokenSource ctsHasOpponent = new();
+        private CancellationTokenSource ctsChangePhase = new();
 
         private void Awake()
         {
@@ -28,91 +31,98 @@ namespace Room
         private void Start()
         {
             text.text = "Ready";
+            myPlayerState = GameManager.gameManager.PlayerObject.GetComponent<PlayerState>();
+        }
+
+        private void Update()
+        {
+            if (countOfPlayers != PhotonNetwork.CountOfPlayers)
+            {
+                playerStates = FindObjectsOfType<PlayerState>();
+                countOfPlayers = PhotonNetwork.CountOfPlayers;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            ctsChangePhase.Cancel();
         }
 
         public void ChangeNextPhase()
         {
-            thisButton.interactable = false;
+            if (!canPassNextPhase) return;
+
+            canPassNextPhase = false;
             GameManager gameManager = GameManager.gameManager;
             
             UniTask.Void(async (CancellationToken cts) =>
             {
-                switch (gameManager.CurrentPage)
+                switch (gameManager.CurrentPhase)
                 {
                     case Phase.WaitPlayer:
-                        await WaitPlayer();
+                        await WaitPlayer(cts);
                         if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
-                        await WaitCoinTossResult();
+                        gameManager.CurrentPhase = Phase.Drow;
                         break;
                     case Phase.Drow:
-                        gameManager.CurrentPage = Phase.StrategyPlan;
+                        gameManager.CurrentPhase = Phase.StrategyPlan;
                         break;
                     case Phase.StrategyPlan:
                         if (gameManager.FirstIdeaCard.PlacedCardInfo == null ||
                             gameManager.SecondIdeaCard.PlacedCardInfo == null ||
                             gameManager.ThirdIdeaCard.PlacedCardInfo == null) return;
-                        gameManager.CurrentPage = Phase.Duel;
+                        gameManager.CurrentPhase = Phase.Duel;
                         break;
                     case Phase.Duel:
-                        gameManager.CurrentPage = Phase.End;
+                        gameManager.CurrentPhase = Phase.End;
                         break;
                     case Phase.End:
-                        gameManager.CurrentPage = Phase.Drow;
+                        gameManager.CurrentPhase = Phase.Drow;
                         break;
                 }
-            }, ctsHasOpponent.Token);
+            }, ctsChangePhase.Token);
 
-            text.text = gameManager.CurrentPage.ToString();
-            thisButton.interactable = true;
+            canPassNextPhase = true;
+            text.text = gameManager.CurrentPhase.ToString();
+        }
+
+        public async UniTask WaitPlayer(CancellationToken cts)
+        {
+            text.text = "Wait Player";
+            myPlayerState.isReadyToPlay = true;
+            thisButton.onClick.AddListener(StopWaitingPlayer);
+
+            while (true)
+            {
+                if (playerStates.Length == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
+                {
+                    Debug.Log("All Player is connected");
+                    thisButton.onClick.RemoveListener(StopWaitingPlayer);
+                    return;
+                }
+                await UniTask.Yield(cts);
+            }
+        }
+
+        public void StopWaitingPlayer()
+        {
+            ctsChangePhase.Cancel();
+            ctsChangePhase = new();
+            thisButton.onClick.RemoveListener(StopWaitingPlayer);
+
+            myPlayerState.isReadyToPlay = false;
+            text.text = "Ready";
+            canPassNextPhase = true;
         }
 
         public void ExecuteCoinToss()
         {
-            bool coin = UnityEngine.Random.Range(0, 2) > 0; // true is first
+            bool coin = UnityEngine.Random.Range(0, 2) > 0;
 
-            SetCoinTossResult(coin);
-            GameManager.gameManager.PlayerObject.GetPhotonView().RPC(nameof(SetCoinTossResult), PhotonNetwork.PlayerList[1], !coin);
-        }
-
-        public void SetCoinTossResult(bool coinResult)
-        {
-            GameManager.gameManager.PlayerObject.GetComponent<PlayerState>().isMyAttackTurn = coinResult;
-        }
-
-        public async UniTask WaitPlayer()
-        {
-            text.text = "Wait Player";
-
-            while (true)
+            foreach (var player in playerStates)
             {
-                if (PhotonNetwork.CountOfPlayers == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
-                {
-                    return;
-                }
-                await UniTask.Yield(ctsHasOpponent.Token);
-            }
-        }
-
-        public async UniTask WaitCoinTossResult()
-        {
-            ctsTimeout = new();
-            ctsTimeout.CancelAfter(TimeSpan.FromSeconds(15));
-
-            try
-            {
-                while (true)
-                {
-                    if (playerStates[0].isMyAttackTurn ^ playerStates[1].isMyAttackTurn) return;
-
-                    await UniTask.Yield(ctsTimeout.Token);
-                }
-            }
-            catch (OperationCanceledException ex)
-            {
-                if (ctsTimeout.Token == ex.CancellationToken)
-                {
-                    Debug.Log("Connecting fail");
-                }
+                player.isMyAttackTurn = coin;
+                coin = !coin;
             }
         }
     }

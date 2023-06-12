@@ -7,6 +7,7 @@ using Card;
 
 public class SetDeckInRoom : MonoBehaviour
 {
+#if UNITY_EDITOR
     [SerializeField]
     private List<CardInfo> deck;
     [Button]
@@ -18,4 +19,5 @@ public class SetDeckInRoom : MonoBehaviour
             GameManager.gameManager.DeckController.SpawnTestCard();
         }
     }
+#endif
 }

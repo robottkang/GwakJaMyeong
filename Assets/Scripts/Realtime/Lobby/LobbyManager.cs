@@ -39,7 +39,10 @@ namespace Lobby
 
         public void LeaveLobby()
         {
-            PhotonNetwork.LeaveLobby();
+            if (PhotonNetwork.InLobby)
+                PhotonNetwork.LeaveLobby();
+            else
+                OnLeftLobby();
         }
         
 
