@@ -4,21 +4,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using Photon.Realtime;
 using TMPro;
 using System;
 using System.Threading;
-using Photon.Realtime;
+using System.Linq;
 
 namespace Room
 {
-    public class PhaseChanger : MonoBehaviourPun
+    public class PhaseManager : MonoBehaviourPun
     {
         [SerializeField]
         private TextMeshProUGUI text;
         private Button thisButton;
-        PlayerState[] playerStates;
+        List<PlayerState> playerStates = new(2);
         PlayerState myPlayerState;
-        private int countOfPlayers = -1;
         private bool canPassNextPhase = true;
 
         private CancellationTokenSource ctsChangePhase = new();
@@ -36,10 +36,9 @@ namespace Room
 
         private void Update()
         {
-            if (countOfPlayers != PhotonNetwork.CountOfPlayers)
+            if (playerStates.Count != PhotonNetwork.ViewCount)
             {
-                playerStates = FindObjectsOfType<PlayerState>();
-                countOfPlayers = PhotonNetwork.CountOfPlayers;
+                playerStates = FindObjectsOfType<PlayerState>().ToList();
             }
         }
 
@@ -94,7 +93,7 @@ namespace Room
 
             while (true)
             {
-                if (playerStates.Length == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
+                if (playerStates.Count == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
                 {
                     Debug.Log("All Player is connected");
                     thisButton.onClick.RemoveListener(StopWaitingPlayer);
