@@ -14,7 +14,7 @@ namespace Card
         {
             base.Awake();
 
-            PhaseEventBus.Subscribe(Phase.Drow, () =>
+            PhaseEventBus.Subscribe(Phase.StrategyPlan, () =>
             {
                 canMove = true;
             });
