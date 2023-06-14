@@ -31,7 +31,7 @@ namespace Room
         private void Start()
         {
             text.text = "Ready";
-            myPlayerState = GameManager.gameManager.PlayerObject.GetComponent<PlayerState>();
+            myPlayerState = GameManager.gameManager.PlayerState;
         }
 
         private void Update()
