@@ -62,6 +62,9 @@ namespace Room
         Drow,
         StrategyPlan,
         Duel,
+        DuelFirstStep,
+        DuelSecondStep,
+        DuelThirdStep,
         End,
     }
 }
