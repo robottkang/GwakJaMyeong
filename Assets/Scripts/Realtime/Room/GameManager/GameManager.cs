@@ -18,23 +18,23 @@ namespace Room
         [field:SerializeField]public DeckController DeckController { get; private set; }
         [field:SerializeField]public DustController DustController { get; private set; }
         [field:SerializeField]public HandController HandController { get; private set; }
-        public GameObject PlayerObject { get; private set; }
+        public PlayerState PlayerState { get; private set; }
 
-        private Phase currentPage = Phase.WaitPlayer;
+        private Phase currentPhase = Phase.WaitPlayer;
         [SerializeField]
         private GameObject counterField;
 
         public Phase CurrentPhase
         {
-            get => currentPage;
+            get => currentPhase;
             set
             {
-                currentPage = value;
+                currentPhase = value;
 
 #if UNITY_EDITOR
-                Debug.Log($"--- Current Page: {currentPage} ---");
+                Debug.Log($"--- Current Page: {currentPhase} ---");
 #endif
-                PhaseEventBus.Publish(currentPage);
+                PhaseEventBus.Publish(currentPhase);
             }
         }
 
@@ -42,7 +42,7 @@ namespace Room
         {
             gameManager = this;
             
-            PlayerObject = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+            PlayerState = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity).GetComponent<PlayerState>();
         }
 
         private void Start()
@@ -62,6 +62,14 @@ namespace Room
         {
             PhotonNetwork.JoinLobby();
             PhotonNetwork.LoadLevel("Lobby");
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            if (CurrentPhase != Phase.WaitPlayer)
+            {
+                LeaveRoom();
+            }
         }
 
         public override void OnDisconnected(DisconnectCause cause)
