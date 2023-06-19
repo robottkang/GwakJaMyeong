@@ -45,6 +45,11 @@ namespace Room
             }
         }
 
+        public static void Clear()
+        {
+            Events.Clear();
+        }
+
         public static void Publish(Phase type)
         {
             UnityEvent thisEvent;
