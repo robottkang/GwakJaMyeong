@@ -10,11 +10,14 @@ namespace Room
         public GameObject cardPrefab;
         
         [Header("- Setting")]
-        public bool activatesCardOnGeneration = true;
+        public bool activatesCardOnGeneration = false;
         public int cardCount = 0;
         public float cardOffsetY = 0.08f;
         private int lastCardIndex;
         private List<GameObject> cardObjects = new();
+
+        public GameObject[] CardObjects => cardObjects.ToArray();
+        public int LastCardIndex => lastCardIndex;
 
         private void Awake()
         {
@@ -24,7 +27,7 @@ namespace Room
         private void GenerateCard(int count)
         {
             cardObjects = new(count);
-            lastCardIndex = activatesCardOnGeneration ? 0 : count - 1;
+            lastCardIndex = activatesCardOnGeneration ? count - 1 : -1;
 
             for (int i = 0; i < count; i++)
             {
@@ -41,27 +44,23 @@ namespace Room
 
         public void DrawCard(int count)
         {
-            lastCardIndex += 1;
-            
             while (count > 0)
             {
+                cardObjects[lastCardIndex].SetActive(false);
+
                 lastCardIndex -= 1;
                 count -= 1;
-
-                cardObjects[lastCardIndex].SetActive(false);
             }
         }
 
         public void StackCard(int count)
         {
-            lastCardIndex -= 1;
-
             while (count > 0)
             {
-                cardObjects[lastCardIndex].SetActive(true);
-
                 lastCardIndex += 1;
-                count += 1;
+                count -= 1;
+                
+                cardObjects[lastCardIndex].SetActive(true);
             }
         }
     }

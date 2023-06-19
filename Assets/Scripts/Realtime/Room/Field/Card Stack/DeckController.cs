@@ -9,24 +9,14 @@ namespace Room
     public class DeckController : MonoBehaviour
     {
 #if UNITY_EDITOR
-        [Button] public void DrawTest() => Draw();
-        [Button] public void SpawnTestCard()
+        [SerializeField] private List<CardInfo> testCardList;
+        [Button] private void SetCard()
         {
-            deck = new(deckList);
-            
-            for (int i = 0; i < 11 - deck.Count; i++)
-            {
-                deck.Add(new());
-            }
-            
-            Start();
+            deck = testCardList;
         }
+        [Button] private void DrawTest() => Draw(3);
 #endif
-        [Header("- Reference")]
-        [SerializeField]
-        private GameObject cardPrefab;
-        [SerializeField]
-        private HandController handController;
+        //[Header("- Reference")]
         private CardStackController cardStackController;
 
         [Header("- Setting")]
@@ -37,34 +27,30 @@ namespace Room
 
         public static List<CardInfo> deckList = new(11);
         private List<CardInfo> deck = new(11);
-        private List<GameObject> cardObjects = new(11);
 
-        public List<CardInfo> Deck => deck;
-        public int DefaultDrawCount => defaultDrawCount;
+        public CardInfo[] Deck => deck.ToArray();
         
         
         private void Awake()
         {
             cardStackController = GetComponent<CardStackController>();
             deck = new(deckList);
-
-            void FirstDraw()
-            {
-                Draw(firstDrawCount);
-                PhaseEventBus.Unsubscribe(Phase.Draw, FirstDraw);
-                PhaseEventBus.Subscribe(Phase.Draw, BasicDraw);
-            }
-            void BasicDraw()
+            
+            void Draw()
             {
                 if (deck.Count < defaultDrawCount)
                 {
-                    GameManager.gameManager.DustController.FillDeck();
+                    DustController dustController = GameManager.gameManager.DustController;
+                    deck.AddRange(dustController.CardsInDust);
+                    dustController.EmptyDust();
+                    deck = Shuffle(deck);
+                    cardStackController.StackCard(9);
                 }
 
-                Draw(defaultDrawCount);
+                this.Draw(GameManager.gameManager.TurnCount == 1 ? firstDrawCount : defaultDrawCount);
             }
 
-            PhaseEventBus.Subscribe(Phase.Draw, FirstDraw);
+            PhaseEventBus.Subscribe(Phase.Draw, Draw);
         }
 
         private void Start()
@@ -98,8 +84,10 @@ namespace Room
             return resultCardsList;
         }
 
-        public void Draw(int count = 1)
+        public void Draw(int count)
         {
+            cardStackController.DrawCard(count);
+
             while (count > 0)
             {
                 if (deck.Count <= 0)
@@ -109,35 +97,16 @@ namespace Room
                 }
 
                 int deckIndex = deck.Count - 1;
-                CardInfo card = deck[deckIndex];
-                handController.AddCard(card);
-                ObjectPool.ReturnObject(cardPoolName, cardObjects[deckIndex]);
-                cardObjects.RemoveAt(deckIndex);
+                GameManager.gameManager.HandController.AddCard(deck[deckIndex]);
                 deck.RemoveAt(deckIndex);
 
                 count -= 1;
             }
         }
 
-        public void SpawnCard()
-        {
-            GameObject spawnedCard = ObjectPool.GetObject(cardPoolName, cardPrefab);
-            cardObjects.Add(spawnedCard);
-
-            Vector3 cardPosition = transform.position + cardObjects.Count * 0.08f * Vector3.up;
-            
-            spawnedCard.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
-        }
-
         public void Initialize()
         {
             deck = Shuffle(deck);
-
-            int deckCount = deck.Count;
-            for (int i = 0; i < deckCount; i++)
-            {
-                SpawnCard();
-            }
         }
     }
 }
