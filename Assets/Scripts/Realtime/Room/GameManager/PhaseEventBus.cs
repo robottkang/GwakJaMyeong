@@ -59,7 +59,7 @@ namespace Room
     public enum Phase
     {
         WaitPlayer,
-        Drow,
+        Draw,
         StrategyPlan,
         Duel,
         DuelFirstStep,

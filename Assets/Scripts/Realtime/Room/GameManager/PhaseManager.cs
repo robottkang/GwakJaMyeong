@@ -61,9 +61,9 @@ namespace Room
                     case Phase.WaitPlayer:
                         await WaitPlayer(cts);
                         if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
-                        gameManager.CurrentPhase = Phase.Drow;
+                        gameManager.CurrentPhase = Phase.Draw;
                         break;
-                    case Phase.Drow:
+                    case Phase.Draw:
                         gameManager.CurrentPhase = Phase.StrategyPlan;
                         break;
                     case Phase.StrategyPlan:
@@ -76,7 +76,7 @@ namespace Room
                         gameManager.CurrentPhase = Phase.End;
                         break;
                     case Phase.End:
-                        gameManager.CurrentPhase = Phase.Drow;
+                        gameManager.CurrentPhase = Phase.Draw;
                         break;
                 }
             }, ctsChangePhase.Token);
