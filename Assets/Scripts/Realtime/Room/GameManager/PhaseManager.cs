@@ -14,6 +14,9 @@ namespace Room
 {
     public class PhaseManager : MonoBehaviourPun
     {
+#if UNITY_EDITOR
+        [EasyButtons.Button] private void ChangePhaseTest(int phase) => GameManager.gameManager.CurrentPhase = (Phase)phase;
+#endif
         [SerializeField]
         private TextMeshProUGUI text;
         private Button thisButton;
