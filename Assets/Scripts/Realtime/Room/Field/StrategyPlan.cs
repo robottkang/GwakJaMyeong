@@ -7,9 +7,12 @@ namespace Room
 {
     public class StrategyPlan : MonoBehaviour
     {
+        [SerializeField]
+        private GameObject cardPrefab;
         private GameObject placedCardObject;
         [SerializeField, ReadOnly]
         private CardInfo placedCardInfo;
+
         public CardInfo PlacedCardInfo
         {
             get => placedCardInfo;
@@ -24,7 +27,7 @@ namespace Room
                 }
 
                 IdeaCard ideaCard;
-                placedCardObject = ObjectPool.GetObject("Card Pool", transform);
+                placedCardObject = ObjectPool.GetObject("Card Pool", cardPrefab);
                 (ideaCard = placedCardObject.GetComponent<IdeaCard>()).CurrentStrategyPlan = this;
                 ideaCard.SetCardSpriteColor(new Color(1f, 1f, 1f, .5f));
                 

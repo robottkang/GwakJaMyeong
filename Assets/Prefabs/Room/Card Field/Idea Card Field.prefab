@@ -59,6 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7609c6b59ebce8c43bc8029eb0e9c80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardPrefab: {fileID: 981924963704536803, guid: 971bfffbb47156e4e88304f7ba25a827, type: 3}
   placedCardInfo: {fileID: 0}
 --- !u!1 &6328942605010078834
 GameObject:
