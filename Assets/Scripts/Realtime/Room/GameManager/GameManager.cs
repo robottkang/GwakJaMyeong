@@ -21,6 +21,7 @@ namespace Room
         public PlayerState PlayerState { get; private set; }
 
         private Phase currentPhase = Phase.WaitPlayer;
+        private int turnCount = 1;
         [SerializeField]
         private GameObject counterField;
 
@@ -37,10 +38,13 @@ namespace Room
                 PhaseEventBus.Publish(currentPhase);
             }
         }
+        public int TurnCount => turnCount;
 
         private void Awake()
         {
             gameManager = this;
+            
+            PhaseEventBus.Subscribe(Phase.End, () => turnCount++);
             
             PlayerState = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity).GetComponent<PlayerState>();
         }
@@ -52,6 +56,8 @@ namespace Room
 
         public void LeaveRoom()
         {
+            PhaseEventBus.Clear();
+
             if (PhotonNetwork.InRoom)
                 PhotonNetwork.LeaveRoom();
             else
