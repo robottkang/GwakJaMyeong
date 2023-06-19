@@ -9,7 +9,7 @@ namespace Room
     public class DeckController : MonoBehaviour
     {
 #if UNITY_EDITOR
-        [Button] public void DrowTest() => Drow();
+        [Button] public void DrawTest() => Draw();
         [Button] public void SpawnTestCard()
         {
             deck = new(deckList);
@@ -27,43 +27,44 @@ namespace Room
         private GameObject cardPrefab;
         [SerializeField]
         private HandController handController;
+        private CardStackController cardStackController;
 
         [Header("- Setting")]
         [SerializeField]
-        private int firstDrowCount = 5;
+        private int firstDrawCount = 5;
         [SerializeField]
-        private int defaultDrowCount = 3;
+        private int defaultDrawCount = 3;
 
         public static List<CardInfo> deckList = new(11);
         private List<CardInfo> deck = new(11);
         private List<GameObject> cardObjects = new(11);
 
         public List<CardInfo> Deck => deck;
-        public int DefaultDrowCount => defaultDrowCount;
-
-        private const string cardPoolName = "Card Pool";
+        public int DefaultDrawCount => defaultDrawCount;
+        
         
         private void Awake()
         {
+            cardStackController = GetComponent<CardStackController>();
             deck = new(deckList);
 
-            void FirstDrow()
+            void FirstDraw()
             {
-                Drow(firstDrowCount);
-                PhaseEventBus.Unsubscribe(Phase.Drow, FirstDrow);
-                PhaseEventBus.Subscribe(Phase.Drow, BasicDrow);
+                Draw(firstDrawCount);
+                PhaseEventBus.Unsubscribe(Phase.Draw, FirstDraw);
+                PhaseEventBus.Subscribe(Phase.Draw, BasicDraw);
             }
-            void BasicDrow()
+            void BasicDraw()
             {
-                if (deck.Count < defaultDrowCount)
+                if (deck.Count < defaultDrawCount)
                 {
                     GameManager.gameManager.DustController.FillDeck();
                 }
 
-                Drow(defaultDrowCount);
+                Draw(defaultDrawCount);
             }
 
-            PhaseEventBus.Subscribe(Phase.Drow, FirstDrow);
+            PhaseEventBus.Subscribe(Phase.Draw, FirstDraw);
         }
 
         private void Start()
@@ -97,18 +98,13 @@ namespace Room
             return resultCardsList;
         }
 
-        public void ShuffleDeck()
-        {
-            deck = Shuffle(deck);
-        }
-
-        public void Drow(int count = 1)
+        public void Draw(int count = 1)
         {
             while (count > 0)
             {
                 if (deck.Count <= 0)
                 {
-                    Debug.LogError("You try drowing, but deck is empty.");
+                    Debug.LogError("You try Drawing, but deck is empty.");
                     return;
                 }
 

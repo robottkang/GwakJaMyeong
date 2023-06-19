@@ -12,15 +12,16 @@ namespace Room
         [Button] private void ClearTest() => ClearStrategyPlans();
         [Button] private void FillTest() => FillDeck();
 #endif
+        private CardStackController cardStackController;
         private StrategyPlan[] strategyPlan;
         private Queue<CardInfo> cardsInDust = new(9);
         private List<GameObject> cardObjectsInDust = new(9);
-
-        private const string poolName = "Card Pool";
+        
 
         private void Awake()
         {
             GameManager gameManager = GameManager.gameManager;
+            cardStackController = GetComponent<CardStackController>();
 
             strategyPlan = new StrategyPlan[3]
             {
@@ -61,7 +62,7 @@ namespace Room
                 ObjectPool.ReturnObject(poolName, cardObjectsInDust[i]);
             }
 
-            deckController.ShuffleDeck();
+            deckController.Shuffle(deckController.Deck);
         }
     }
 }
