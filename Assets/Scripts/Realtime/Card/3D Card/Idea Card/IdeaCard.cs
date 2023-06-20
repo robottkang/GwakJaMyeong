@@ -13,7 +13,6 @@ namespace Card
         private SpriteRenderer backgroundSprite;
         [SerializeField]
         private CardInfo cardInfo;
-        private bool canMove = false;
         private Vector3 originPosition;
         [SerializeField, ReadOnly]
         private StrategyPlan currentStrategyPlan;
@@ -32,7 +31,7 @@ namespace Card
                 if (value != null)
                 {
                     CardInfo = CurrentStrategyPlan.PlacedCardInfo;
-                    canMove = true;
+                    cardSprite.color = new(1f, 1f, 1f, 0.5f);
                 }
             }
         }
@@ -51,61 +50,51 @@ namespace Card
         private void Awake()
         {
             mainCamera = Camera.main;
-
-            PhaseEventBus.Subscribe(Phase.Duel, () =>
-            {
-                canMove = false;
-            });
         }
 
         private void OnDisable()
         {
             CurrentStrategyPlan = null;
-            canMove = false;
-        }
-
-        public void SetCardSpriteColor(Color color)
-        {
-            cardSprite.color = color;
+            cardSprite.color = Color.white;
         }
 
         private void OnMouseDown()
         {
-            if (!canMove) return;
-
+            cardSprite.color = new(1f, 1f, 1f, 1f);
             originPosition = transform.position;
         }
 
         private void OnMouseDrag()
         {
-            if (!canMove) return;
-
             Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Board"));
             transform.position = hitInfo.point + Vector3.up;
         }
 
         private void OnMouseUp()
         {
-            if (!canMove) return;
-
             Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field")))
             {
-                StrategyPlan strategyPlan;
-                if ((strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
-                {
-                    strategyPlan.PlacedCardInfo = CardInfo;
-                    CurrentStrategyPlan.ClearStrategyPlan();
-                }
-                else if (strategyPlan == CurrentStrategyPlan)
+                cardSprite.color = new(1f, 1f, 1f, 0.5f);
+                StrategyPlan strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>();
+
+                // if Card doesn't move
+                if (strategyPlan == CurrentStrategyPlan)
                 {
                     transform.position = originPosition;
                     return;
                 }
-                else // if PlacedCard is not null, trade card <- implement later
+                // if PlacedCard is null
+                else if (strategyPlan.PlacedCardInfo == null)
                 {
-                    //resultCardInfo = strategyPlan.PlacedCardInfo;
-                    //strategyPlan.PlacedCardInfo = CardInfo;
+                    strategyPlan.PlacedCardInfo = CardInfo;
+                    CurrentStrategyPlan.ClearStrategyPlan();
+                }
+                // if PlacedCard is not null, trade card
+                else if (strategyPlan.PlacedCardInfo != null)
+                {
+                    IdeaCard targetIdeaCard = strategyPlan.PlacedCardObejct.GetComponent<IdeaCard>();
+                    (CardInfo, targetIdeaCard.CardInfo) = (targetIdeaCard.CardInfo, CardInfo);
                     transform.position = originPosition;
                     return;
                 }
@@ -114,7 +103,7 @@ namespace Card
             {
                 GameManager.gameManager.HandController.AddCard(CardInfo);
                 CurrentStrategyPlan.ClearStrategyPlan();
-                SetCardSpriteColor(new Color(1f, 1f, 1f, 1f));
+                cardSprite.color = new(1f, 1f, 1f, 1f);
             }
         }
     }
