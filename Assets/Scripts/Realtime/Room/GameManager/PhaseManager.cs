@@ -4,9 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
-using Photon.Realtime;
 using TMPro;
-using System;
 using System.Threading;
 using System.Linq;
 
@@ -17,19 +15,16 @@ namespace Room
 #if UNITY_EDITOR
         [EasyButtons.Button] private void ChangePhaseTest(int phase) => GameManager.gameManager.CurrentPhase = (Phase)phase;
 #endif
+        [Header("- UI")]
         [SerializeField]
         private TextMeshProUGUI text;
-        private Button thisButton;
+        [SerializeField]
+        private Button phaseButton;
         List<PlayerState> playerStates = new(2);
         PlayerState myPlayerState;
         private bool canPassNextPhase = true;
 
         private CancellationTokenSource ctsChangePhase = new();
-
-        private void Awake()
-        {
-            thisButton = GetComponent<Button>();
-        }
 
         private void Start()
         {
@@ -92,14 +87,14 @@ namespace Room
         {
             text.text = "Wait Player";
             myPlayerState.isReadyToPlay = true;
-            thisButton.onClick.AddListener(StopWaitingPlayer);
+            phaseButton.onClick.AddListener(StopWaitingPlayer);
 
             while (true)
             {
                 if (playerStates.Count == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
                 {
                     Debug.Log("All Player is connected");
-                    thisButton.onClick.RemoveListener(StopWaitingPlayer);
+                    phaseButton.onClick.RemoveListener(StopWaitingPlayer);
                     return;
                 }
                 await UniTask.Yield(cts);
@@ -110,7 +105,7 @@ namespace Room
         {
             ctsChangePhase.Cancel();
             ctsChangePhase = new();
-            thisButton.onClick.RemoveListener(StopWaitingPlayer);
+            phaseButton.onClick.RemoveListener(StopWaitingPlayer);
 
             myPlayerState.isReadyToPlay = false;
             text.text = "Ready";
