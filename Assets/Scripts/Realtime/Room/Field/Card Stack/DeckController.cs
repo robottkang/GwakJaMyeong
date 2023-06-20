@@ -12,7 +12,8 @@ namespace Room
         [SerializeField] private List<CardInfo> testCardList;
         [Button] private void SetCard()
         {
-            deck = testCardList;
+            if (!Application.isPlaying) return;
+            deck = Shuffle(testCardList);
         }
         [Button] private void DrawTest() => Draw(3);
 #endif
