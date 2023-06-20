@@ -132,6 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 121725172}
+  - component: {fileID: 121725173}
   m_Layer: 0
   m_Name: Opponent Field
   m_TagString: Untagged
@@ -160,6 +161,20 @@ Transform:
   m_Father: {fileID: 1468037751}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &121725173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121725171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d855a80b5cb4c14bbe809ea8813eba1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deck: {fileID: 645422914}
+  dust: {fileID: 1385661894}
 --- !u!1 &176128745
 GameObject:
   m_ObjectHideFlags: 0
@@ -1745,7 +1760,7 @@ GameObject:
   - component: {fileID: 1060080425}
   - component: {fileID: 1060080424}
   m_Layer: 5
-  m_Name: Page Changing Button
+  m_Name: Phase Changing Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2868,6 +2883,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 437336100}
+  phaseButton: {fileID: 1060080424}
 --- !u!1 &1468037750
 GameObject:
   m_ObjectHideFlags: 0
