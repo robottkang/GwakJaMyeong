@@ -13,6 +13,7 @@ namespace Room
         [SerializeField, ReadOnly]
         private CardInfo placedCardInfo;
 
+        public GameObject PlacedCardObejct => placedCardObject;
         public CardInfo PlacedCardInfo
         {
             get => placedCardInfo;
@@ -26,10 +27,8 @@ namespace Room
                     return;
                 }
 
-                IdeaCard ideaCard;
                 placedCardObject = ObjectPool.GetObject("Card Pool", cardPrefab);
-                (ideaCard = placedCardObject.GetComponent<IdeaCard>()).CurrentStrategyPlan = this;
-                ideaCard.SetCardSpriteColor(new Color(1f, 1f, 1f, .5f));
+                placedCardObject.GetComponent<IdeaCard>().CurrentStrategyPlan = this;
                 
                 placedCardObject.transform.SetPositionAndRotation(transform.position + Vector3.up * 0.08f, Quaternion.Euler(0f, 0f, 0f));
             }
@@ -41,7 +40,6 @@ namespace Room
 
             if (placedCardObject != null)
                 ObjectPool.ReturnObject("Card Pool", placedCardObject);
-            placedCardObject.GetComponent<IdeaCard>().SetCardSpriteColor(Color.white);
             placedCardObject = null;
         }
     }
