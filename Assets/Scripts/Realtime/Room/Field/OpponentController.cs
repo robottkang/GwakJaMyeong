@@ -17,7 +17,18 @@ namespace Room
         {
             PhaseEventBus.Subscribe(Phase.Draw, () =>
             {
+                if (deck.CardObjects.Length == 0)
+                {
+                    dust.DrawCard(9);
+                    deck.StackCard(9);
+                }
+
                 deck.DrawCard(GameManager.gameManager.TurnCount == 1 ? 5 : 3);
+            });
+
+            PhaseEventBus.Subscribe(Phase.End, () =>
+            {
+                dust.StackCard(3);
             });
         }
 
