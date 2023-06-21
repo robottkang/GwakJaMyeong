@@ -23,7 +23,7 @@ namespace Room
                     deck.StackCard(9);
                 }
 
-                deck.DrawCard(GameManager.gameManager.TurnCount == 1 ? 5 : 3);
+                deck.DrawCard(PhaseManager.Instance.TurnCount == 1 ? 5 : 3);
             });
 
             PhaseEventBus.Subscribe(Phase.End, () =>
