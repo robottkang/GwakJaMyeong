@@ -17,8 +17,10 @@ namespace Room
         }
         [Button] private void DrawTest() => Draw(3);
 #endif
-        //[Header("- Reference")]
+        [Header("- Reference")]
         private CardStackController cardStackController;
+        [SerializeField]
+        private DustController dustController;
 
         [Header("- Setting")]
         [SerializeField]
@@ -41,14 +43,13 @@ namespace Room
             {
                 if (deck.Count < defaultDrawCount)
                 {
-                    DustController dustController = GameManager.gameManager.DustController;
                     deck.AddRange(dustController.CardsInDust);
                     dustController.EmptyDust();
                     deck = Shuffle(deck);
                     cardStackController.StackCard(9);
                 }
 
-                this.Draw(GameManager.gameManager.TurnCount == 1 ? firstDrawCount : defaultDrawCount);
+                this.Draw(PhaseManager.Instance.TurnCount == 1 ? firstDrawCount : defaultDrawCount);
             }
 
             PhaseEventBus.Subscribe(Phase.Draw, Draw);
@@ -98,7 +99,7 @@ namespace Room
                 }
 
                 int deckIndex = deck.Count - 1;
-                GameManager.gameManager.HandController.AddCard(deck[deckIndex]);
+                HandManager.Instance.AddCard(deck[deckIndex]);
                 deck.RemoveAt(deckIndex);
 
                 count -= 1;
