@@ -58,19 +58,20 @@ namespace Card
             cardSprite.color = Color.white;
         }
 
-        private void OnMouseDown()
+        // - StrategyPlan Phase -
+        private void PickUp()
         {
             cardSprite.color = new(1f, 1f, 1f, 1f);
             originPosition = transform.position;
         }
 
-        private void OnMouseDrag()
+        private void Move()
         {
             Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Board"));
             transform.position = hitInfo.point + Vector3.up;
         }
 
-        private void OnMouseUp()
+        private void Drop()
         {
             Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field")))
@@ -101,9 +102,47 @@ namespace Card
             }
             else
             {
-                GameManager.gameManager.HandController.AddCard(CardInfo);
+                HandManager.Instance.AddCard(CardInfo);
                 CurrentStrategyPlan.ClearStrategyPlan();
                 cardSprite.color = new(1f, 1f, 1f, 1f);
+            }
+        }
+
+        // - Duel Phase -
+
+        private void OnMouseDown()
+        {
+            switch (PhaseManager.Instance.CurrentPhase)
+            {
+                case Phase.StrategyPlan:
+                    PickUp();
+                    break;
+                case Phase.Duel:
+                    break;
+            }
+        }
+
+        private void OnMouseDrag()
+        {
+            switch (PhaseManager.Instance.CurrentPhase)
+            {
+                case Phase.StrategyPlan:
+                    Move();
+                    break;
+                case Phase.Duel:
+                    break;
+            }
+        }
+
+        private void OnMouseUp()
+        {
+            switch (PhaseManager.Instance.CurrentPhase)
+            {
+                case Phase.StrategyPlan:
+                    Drop();
+                    break;
+                case Phase.Duel:
+                    break;
             }
         }
     }
