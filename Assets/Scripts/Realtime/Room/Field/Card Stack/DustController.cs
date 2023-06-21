@@ -13,22 +13,14 @@ namespace Room
         [Button] private void EmptyTest() => EmptyDust();
 #endif
         private CardStackController cardStackController;
-        private StrategyPlan[] strategyPlan;
         private Queue<CardInfo> cardsInDust = new(9);
 
         public CardInfo[] CardsInDust => cardsInDust.ToArray();
 
         private void Awake()
         {
-            GameManager gameManager = GameManager.gameManager;
+            GameManager gameManager = GameManager.Instance;
             cardStackController = GetComponent<CardStackController>();
-
-            strategyPlan = new StrategyPlan[3]
-            {
-                gameManager.FirstIdeaCard,
-                gameManager.SecondIdeaCard,
-                gameManager.ThirdIdeaCard
-            };
 
             PhaseEventBus.Subscribe(Phase.End, ClearStrategyPlans);
         }
@@ -37,8 +29,8 @@ namespace Room
         {
             for (int i = 0; i < 3; i++)
             {
-                cardsInDust.Enqueue(strategyPlan[i].PlacedCardInfo);
-                strategyPlan[i].ClearStrategyPlan();
+                cardsInDust.Enqueue(GameManager.Instance.StrategyPlans[i].PlacedCardInfo);
+                GameManager.Instance.StrategyPlans[i].ClearStrategyPlan();
             }
 
             cardStackController.StackCard(3);
