@@ -67,9 +67,6 @@ namespace Room
         Draw,
         StrategyPlan,
         Duel,
-        DuelFirstStep,
-        DuelSecondStep,
-        DuelThirdStep,
         End,
     }
 }
