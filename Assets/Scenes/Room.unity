@@ -1759,6 +1759,7 @@ GameObject:
   - component: {fileID: 1060080426}
   - component: {fileID: 1060080425}
   - component: {fileID: 1060080424}
+  - component: {fileID: 1060080427}
   m_Layer: 5
   m_Name: Phase Changing Button
   m_TagString: Untagged
@@ -1831,8 +1832,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464204214}
-        m_TargetAssemblyTypeName: Room.PhaseManager, Assembly-CSharp
+      - m_Target: {fileID: 1060080427}
+        m_TargetAssemblyTypeName: Room.PhaseController, Assembly-CSharp
         m_MethodName: ChangeNextPhase
         m_Mode: 1
         m_Arguments:
@@ -1881,6 +1882,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1060080422}
   m_CullTransparentMesh: 1
+--- !u!114 &1060080427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1060080422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cde2487416d6c428cda05c9fd075cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 437336100}
+  phaseButton: {fileID: 1060080424}
 --- !u!1001 &1061435339
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2813,7 +2828,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1464204210}
   - component: {fileID: 1464204209}
-  - component: {fileID: 1464204214}
   - component: {fileID: 1464204212}
   m_Layer: 0
   m_Name: GameManager
@@ -2835,12 +2849,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <PostureCard>k__BackingField: {fileID: 577921453}
-  <FirstIdeaCard>k__BackingField: {fileID: 1433916087}
-  <SecondIdeaCard>k__BackingField: {fileID: 1967565614}
-  <ThirdIdeaCard>k__BackingField: {fileID: 1061435341}
+  <StrategyPlans>k__BackingField:
+  - {fileID: 1433916087}
+  - {fileID: 1967565614}
+  - {fileID: 1061435341}
   <DeckController>k__BackingField: {fileID: 1795851381}
   <DustController>k__BackingField: {fileID: 1794932238}
-  <HandController>k__BackingField: {fileID: 723570790}
   counterField: {fileID: 121725171}
 --- !u!4 &1464204210
 Transform:
@@ -2870,20 +2884,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointer: {fileID: 305926663727100960, guid: c7f5f1a0ab090a443870d9e9460ba9fc, type: 3}
---- !u!114 &1464204214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1464204208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97cde2487416d6c428cda05c9fd075cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 437336100}
-  phaseButton: {fileID: 1060080424}
 --- !u!1 &1468037750
 GameObject:
   m_ObjectHideFlags: 0
