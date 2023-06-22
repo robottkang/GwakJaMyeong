@@ -5,7 +5,7 @@ using Card;
 
 namespace DeckBuilding
 {
-    public class SpawnerCard : MonoBehaviour
+    public class CardGenerater : MonoBehaviour
     {
         [SerializeField]
         private CardInfo cardInfo;
@@ -16,8 +16,8 @@ namespace DeckBuilding
         {
             for (int i = 0; i < 3; i++)
             {
-                var spawnedCard = Instantiate(card, transform);
-                spawnedCard.GetComponent<DeckBuildingCard>().CardInfo = cardInfo;
+                var generatedCard = Instantiate(card, transform);
+                generatedCard.GetComponent<DeckBuildingCard>().CardInfo = cardInfo;
             }
         }
     }
