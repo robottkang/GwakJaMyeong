@@ -28,6 +28,8 @@ namespace Room
 
         private void Awake()
         {
+            Instance = this;
+
             PhaseEventBus.Subscribe(Phase.End, () => turnCount++);
         }
     }
