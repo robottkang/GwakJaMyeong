@@ -14,7 +14,7 @@ namespace Room
         
         [SerializeField]
         private GameObject counterField;
-        private List<PlayerState> playerStateList;
+        private List<PlayerState> playerStateList = new(2);
         
         [field:SerializeField]public StrategyPlan[] StrategyPlans { get; private set; } = new StrategyPlan[3];
         public PlayerState MyPlayerState { get; private set; }

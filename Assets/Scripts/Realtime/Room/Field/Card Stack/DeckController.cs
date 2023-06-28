@@ -15,7 +15,6 @@ namespace Room
             if (!Application.isPlaying) return;
             deck = Shuffle(testCardList);
         }
-        [Button] private void DrawTest() => Draw(3);
 #endif
         [Header("- Reference")]
         private CardStackController cardStackController;

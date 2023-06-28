@@ -22,7 +22,7 @@ namespace Room
                     dust.DrawCard(9);
                     deck.StackCard(9);
                 }
-
+                
                 deck.DrawCard(PhaseManager.Instance.TurnCount == 1 ? 5 : 3);
             });
 

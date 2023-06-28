@@ -6,6 +6,10 @@ namespace Room
 {
     public class CardStackController : MonoBehaviour
     {
+#if UNITY_EDITOR
+        [EasyButtons.Button] private void DrawTest(int count) => DrawCard(count);
+        [EasyButtons.Button] private void StackTest(int count) => StackCard(count);
+#endif
         [Header("- Reference")]
         public GameObject cardPrefab;
         
