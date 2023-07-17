@@ -17,7 +17,7 @@ namespace Room
         [ReadOnly]
         public int StrategyPlanOrder = 0;
         [ReadOnly]
-        public StrategyPlan.IdeaCardInfo currentIdeaCard;
+        public StrategyPlan.PlanCardInfo currentPlanCard;
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
@@ -35,7 +35,7 @@ namespace Room
                 isReadyToPlay = (bool)stream.ReceiveNext();
                 setPosture = (bool)stream.ReceiveNext();
                 hasActionToken = (bool)stream.ReceiveNext();
-                currentIdeaCard = (StrategyPlan.IdeaCardInfo)stream.ReceiveNext();
+                currentPlanCard = (StrategyPlan.PlanCardInfo)stream.ReceiveNext();
             }
         }
     }

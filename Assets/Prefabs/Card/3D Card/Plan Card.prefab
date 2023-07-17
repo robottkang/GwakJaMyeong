@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 8053878334297653575}
   - component: {fileID: 1055142894489892542}
   m_Layer: 7
-  m_Name: Idea Card
+  m_Name: Plan Card
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

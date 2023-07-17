@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 1967130255078143946}
   - component: {fileID: 1749727454247894934}
   m_Layer: 7
-  m_Name: Dummy Idea Card
+  m_Name: Dummy Plan Card
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

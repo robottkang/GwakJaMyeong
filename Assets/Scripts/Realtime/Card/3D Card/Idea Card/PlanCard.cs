@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Card
 {
-    public class IdeaCard : MonoBehaviour
+    public class PlanCard : MonoBehaviour
     {
         [SerializeField]
         private SpriteRenderer cardSprite;
@@ -58,7 +58,7 @@ namespace Card
             cardSprite.color = Color.white;
         }
 
-        // - StrategyPlan Phase -
+        #region StrategyPlan Phase
         private void PickUp()
         {
             cardSprite.color = new(1f, 1f, 1f, 1f);
@@ -74,7 +74,7 @@ namespace Card
         private void Drop()
         {
             Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field")))
+            if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field")))
             {
                 cardSprite.color = new(1f, 1f, 1f, 0.5f);
                 StrategyPlan strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>();
@@ -94,8 +94,8 @@ namespace Card
                 // if PlacedCard is not null, trade card
                 else if (strategyPlan.PlacedCardInfo != null)
                 {
-                    IdeaCard targetIdeaCard = strategyPlan.PlacedCardObejct.GetComponent<IdeaCard>();
-                    (CardInfo, targetIdeaCard.CardInfo) = (targetIdeaCard.CardInfo, CardInfo);
+                    PlanCard targetPlanCard = strategyPlan.PlacedCardObejct.GetComponent<PlanCard>();
+                    (CardInfo, targetPlanCard.CardInfo) = (targetPlanCard.CardInfo, CardInfo);
                     transform.position = originPosition;
                     return;
                 }
@@ -107,9 +107,10 @@ namespace Card
                 cardSprite.color = new(1f, 1f, 1f, 1f);
             }
         }
+        #endregion
+        #region Duel Phase
 
-        // - Duel Phase -
-
+        #endregion
         private void OnMouseDown()
         {
             switch (PhaseManager.Instance.CurrentPhase)

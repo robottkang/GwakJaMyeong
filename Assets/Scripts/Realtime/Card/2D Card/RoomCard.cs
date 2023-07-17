@@ -38,7 +38,7 @@ namespace Card
             base.OnEndDrag(eventData);
 
             Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field"));
+            Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field"));
 
             StrategyPlan strategyPlan;
             if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)

@@ -11,10 +11,10 @@ namespace Room
         private GameObject cardPrefab;
         private GameObject placedCardObject;
         [SerializeField, ReadOnly]
-        private CardInfo placedCardInfo;
+        private PlanCardInfo placedCardInfo;
 
         public GameObject PlacedCardObejct => placedCardObject;
-        public CardInfo PlacedCardInfo
+        public PlanCardInfo PlacedCardInfo
         {
             get => placedCardInfo;
             set
@@ -28,7 +28,7 @@ namespace Room
                 }
 
                 placedCardObject = ObjectPool.GetObject("Card Pool", cardPrefab);
-                placedCardObject.GetComponent<IdeaCard>().CurrentStrategyPlan = this;
+                placedCardObject.GetComponent<PlanCard>().CurrentStrategyPlan = this;
                 
                 placedCardObject.transform.SetPositionAndRotation(transform.position + Vector3.up * 0.08f, Quaternion.Euler(0f, 0f, 0f));
             }
@@ -41,6 +41,18 @@ namespace Room
             if (placedCardObject != null)
                 ObjectPool.ReturnObject("Card Pool", placedCardObject);
             placedCardObject = null;
+        }
+
+        public class PlanCardInfo : CardInfo
+        {
+            public CardState cardState = CardState.Placed;
+
+            public enum CardState
+            {
+                Placed,
+                Opened,
+                Turned,
+            }
         }
     }
 }

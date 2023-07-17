@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8125580088875839368}
   - component: {fileID: 8679590980589873250}
   m_Layer: 8
-  m_Name: Idea Card Field
+  m_Name: Plan Card Field
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
