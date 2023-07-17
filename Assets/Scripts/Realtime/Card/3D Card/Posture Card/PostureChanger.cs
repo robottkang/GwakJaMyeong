@@ -15,26 +15,12 @@ namespace Room
         [SerializeField]
         private PostureCard postureCard;
         [ReadOnly]
-        public Posture availablePosture;
+        public CardInfo.Posture availablePosture;
 
         private Camera mainCamera;
 
-        private void Awake()
-        {
-            PhaseEventBus.Subscribe(Phase.StrategyPlan, () =>
-            {
-                gameObject.SetActive(true);
-            });
-            PhaseEventBus.Subscribe(Phase.Duel, () =>
-            {
-                gameObject.SetActive(false);
-            });
-        }
-
         private void Start()
         {
-            gameObject.SetActive(false);
-
             mainCamera = Camera.main;
 
             Initialize();
@@ -88,18 +74,20 @@ namespace Room
             }
         }
 
-        public void Initialize()
+        private void Initialize()
         {
             foreach (var postureInfo in postureInfos)
             {
                 postureInfo.postureObject.SetActive(false);
             }
+
+            gameObject.SetActive(false);
         }
 
         [System.Serializable]
         private struct PostureInfo
         {
-            public Posture posture;
+            public CardInfo.Posture posture;
             public GameObject postureObject;
             [Tooltip("The foward direction is zero degrees")]
             [Range(-180f, 180f)]

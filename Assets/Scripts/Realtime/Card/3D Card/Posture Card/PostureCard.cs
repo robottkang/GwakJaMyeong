@@ -7,40 +7,28 @@ namespace Card
 {
     public class PostureCard : MonoBehaviour
     {
-        private Posture currentPosture = Posture.VomTag;
-        public Posture CurrentPosture
+        private CardInfo.Posture currentPosture = CardInfo.Posture.VomTag;
+        public CardInfo.Posture CurrentPosture
         {
             get => currentPosture;
             set
             {
-                switch (value)
-                {
-                    case Posture.VomTag:
-                        transform.rotation = Quaternion.Euler(0, 0, 0);
-                        break;
-                    case Posture.Pflug:
-                        transform.rotation = Quaternion.Euler(0, 45, 0);
-                        break;
-                    case Posture.Ochs:
-                        transform.rotation = Quaternion.Euler(0, 90, 0);
-                        break;
-                    case Posture.Alber:
-                        transform.rotation = Quaternion.Euler(0, 0, 180);
-                        break;
-                    default:
-                        throw new InvalidOperationException();
-                }
+                currentPosture = value;
+
+                RotatePosture(currentPosture);
             }
         }
-    }
 
-    [Flags]
-    public enum Posture
-    {
-        None = 0,
-        VomTag = 1,
-        Pflug = 2,
-        Ochs = 4,
-        Alber = 8,
+        private void RotatePosture(CardInfo.Posture posture)
+        {
+            transform.rotation = posture switch
+            {
+                CardInfo.Posture.VomTag => Quaternion.Euler(0, 0, 0),
+                CardInfo.Posture.Pflug => Quaternion.Euler(0, 45, 0),
+                CardInfo.Posture.Ochs => Quaternion.Euler(0, 90, 0),
+                CardInfo.Posture.Alber => Quaternion.Euler(0, 0, 180),
+                _ => throw new InvalidOperationException(),
+            };
+        }
     }
 }
