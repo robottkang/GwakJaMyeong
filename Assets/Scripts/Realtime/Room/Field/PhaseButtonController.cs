@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using TMPro;
 using System.Threading;
-using System.Linq;
 
 namespace Room
 {
@@ -20,7 +19,8 @@ namespace Room
         private TextMeshProUGUI text;
         [SerializeField]
         private Button phaseButton;
-        List<PlayerState> playerStates = new(2);
+        [SerializeField]
+        private PostureChanger postureChanger;
         private bool canPassNextPhase = true;
 
         private CancellationTokenSource ctsChangePhase = new();
@@ -52,6 +52,7 @@ namespace Room
                         phaseManager.CurrentPhase = Phase.Draw;
                         break;
                     case Phase.Draw:
+                        await ChoosePosture(cts);
                         phaseManager.CurrentPhase = Phase.StrategyPlan;
                         break;
                     case Phase.StrategyPlan:
@@ -74,13 +75,16 @@ namespace Room
 
         public async UniTask WaitPlayer(CancellationToken cts)
         {
+            GameManager gameManager = GameManager.Instance;
             text.text = "Wait Player";
-            GameManager.Instance.MyPlayerState.isReadyToPlay = true;
+            gameManager.MyPlayerState.isReadyToPlay = true;
             phaseButton.onClick.AddListener(StopWaitingPlayer);
 
             while (true)
             {
-                if (playerStates.Count == 2 && playerStates[0].isReadyToPlay && playerStates[1].isReadyToPlay)
+                if (gameManager.MyPlayerState.isReadyToPlay && 
+                    gameManager.OpponentPlayerState != null && 
+                    gameManager.OpponentPlayerState.isReadyToPlay)
                 {
                     Debug.Log("All Player is connected");
                     phaseButton.onClick.RemoveListener(StopWaitingPlayer);
@@ -105,11 +109,17 @@ namespace Room
         {
             bool coin = UnityEngine.Random.Range(0, 2) > 0;
 
-            foreach (var player in playerStates)
-            {
-                player.isMyAttackTurn = coin;
-                coin = !coin;
-            }
+            GameManager.Instance.MyPlayerState.hasActionToken = coin;
+            GameManager.Instance.OpponentPlayerState.hasActionToken = !coin;
+        }
+
+        public async UniTask ChoosePosture(CancellationToken cts)
+        {
+            GameManager gameManager = GameManager.Instance;
+            await UniTask.WaitUntil(() => gameManager.MyPlayerState.hasActionToken, cancellationToken: cts);
+            text.text = "Choose Posture";
+
+            await UniTask.WaitUntil(() => gameManager.MyPlayerState.setPosture && gameManager.OpponentPlayerState.setPosture, cancellationToken: cts);
         }
     }
 }
