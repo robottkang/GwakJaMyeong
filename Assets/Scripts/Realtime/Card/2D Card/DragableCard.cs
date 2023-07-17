@@ -12,8 +12,7 @@ namespace Card
         private CardInfo cardInfo;
         protected Vector3 offset;
         private Vector3 originPosition;
-        [HideInInspector]
-        public Transform targetParent;
+        private Transform originParent;
 
         protected Image image;
 
@@ -28,6 +27,7 @@ namespace Card
             }
         }
         protected Vector3 OriginPosition => originPosition;
+        protected Transform OriginParent => originParent;
 
         protected virtual void Awake()
         {
@@ -36,14 +36,14 @@ namespace Card
 
         protected virtual void Start()
         {
-            targetParent = transform.parent;
+            originParent = transform.parent;
             image.sprite = cardInfo.CardSprite;
         }
 
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             image.raycastTarget = false;
-            transform.SetParent(transform.GetComponentInParent<Canvas>().transform);
+            transform.SetParent(GetComponentInParent<Canvas>().transform);
 
             originPosition = transform.position;
             offset = transform.position - Input.mousePosition;
@@ -57,7 +57,6 @@ namespace Card
 
         public virtual void OnEndDrag(PointerEventData eventData)
         {
-            transform.SetParent(targetParent);
             image.raycastTarget = true;
         }
     }
