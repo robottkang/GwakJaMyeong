@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d64c780327d1f94590469e2f07dedef, type: 3}
   m_Name: "\uC544\uC6B0\uD504\uC288\uD2B8\uB77C\uC5D0\uCCB8"
   m_EditorClassIdentifier: 
-  cardSprite: {fileID: 21300000, guid: 78ca8ec47c6850d4b918b2d1eedbe8ec, type: 3}
-  damage: 0
+  cardSprite: {fileID: 100111307, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
+  cardCode: 0
   attack: 0
+  damage: 0
   guardPoint: 0
-  useConditions: 0
-  postAttackPosture: 0
