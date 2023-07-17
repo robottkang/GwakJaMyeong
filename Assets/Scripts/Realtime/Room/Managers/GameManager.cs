@@ -14,11 +14,10 @@ namespace Room
         
         [SerializeField]
         private GameObject counterField;
-        private List<PlayerState> playerStateList = new(2);
         
         [field:SerializeField]public StrategyPlan[] StrategyPlans { get; private set; } = new StrategyPlan[3];
         public PlayerState MyPlayerState { get; private set; }
-        public PlayerState[] PlayerStateList => playerStateList.ToArray();
+        public PlayerState OpponentPlayerState { get; private set; }
 
 
         private void Awake()
@@ -35,9 +34,13 @@ namespace Room
 
         private void Update()
         {
-            if (playerStateList.Count != PhotonNetwork.CurrentRoom.PlayerCount)
+            if (OpponentPlayerState == null)
             {
-                playerStateList = FindObjectsOfType<PlayerState>().ToList();
+                foreach (var playerState in FindObjectsOfType<PlayerState>())
+                {
+                    if (playerState == MyPlayerState) return;
+                    OpponentPlayerState = playerState;
+                }
             }
         }
 
@@ -59,6 +62,8 @@ namespace Room
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
+            OpponentPlayerState = null;
+
             if (PhaseManager.Instance.CurrentPhase != Phase.WaitPlayer)
             {
                 LeaveRoom();
