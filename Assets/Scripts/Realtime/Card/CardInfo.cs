@@ -31,10 +31,10 @@ namespace Card
         public AttackType GuardPoint => guardPoint;
         public bool CanBeInvaild => canBeInvaild;
 
-        public UnityEvent OnCardOpen { get; set; } = new();
-        public UnityEvent OnCardTurn { get; set; } = new();
-        public UnityEvent OnCardSum { get; set; } = new();
-        public UnityEvent OnCardEffect { get; set; } = new();
+        public UnityEvent onCardOpen = new();
+        public UnityEvent onCardTurn = new();
+        public UnityEvent onCardSum = new();
+        public UnityEvent onCardEffect = new();
 
         [Flags]
         public enum AttackType
