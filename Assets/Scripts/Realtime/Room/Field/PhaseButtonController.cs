@@ -77,14 +77,14 @@ namespace Room
         {
             GameManager gameManager = GameManager.Instance;
             text.text = "Wait Player";
-            gameManager.MyPlayerState.isReadyToPlay = true;
+            gameManager.MyPlayerView.readyToPlay = true;
             phaseButton.onClick.AddListener(StopWaitingPlayer);
 
             while (true)
             {
-                if (gameManager.MyPlayerState.isReadyToPlay && 
-                    gameManager.OpponentPlayerState != null && 
-                    gameManager.OpponentPlayerState.isReadyToPlay)
+                if (gameManager.MyPlayerView.readyToPlay && 
+                    gameManager.OpponentPlayerView != null && 
+                    gameManager.OpponentPlayerView.readyToPlay)
                 {
                     Debug.Log("All Player is connected");
                     phaseButton.onClick.RemoveListener(StopWaitingPlayer);
@@ -100,7 +100,7 @@ namespace Room
             ctsChangePhase = new();
             phaseButton.onClick.RemoveListener(StopWaitingPlayer);
 
-            GameManager.Instance.MyPlayerState.isReadyToPlay = false;
+            GameManager.Instance.MyPlayerView.readyToPlay = false;
             text.text = "Ready";
             canPassNextPhase = true;
         }
@@ -109,17 +109,20 @@ namespace Room
         {
             bool coin = UnityEngine.Random.Range(0, 2) > 0;
 
-            GameManager.Instance.MyPlayerState.hasActionToken = coin;
-            GameManager.Instance.OpponentPlayerState.hasActionToken = !coin;
+            //GameManager.Instance.MyPlayerView.duelManager.hasActionToken = coin;
+            //GameManager.Instance.OpponentPlayerView.duelManager.hasActionToken = !coin;
         }
 
         public async UniTask ChoosePosture(CancellationToken cts)
         {
             GameManager gameManager = GameManager.Instance;
-            await UniTask.WaitUntil(() => gameManager.MyPlayerState.hasActionToken, cancellationToken: cts);
+            //await UniTask.WaitUntil(() => gameManager.MyPlayerView.duelManager.hasActionToken, cancellationToken: cts);
             text.text = "Choose Posture";
 
-            await UniTask.WaitUntil(() => gameManager.MyPlayerState.setPosture && gameManager.OpponentPlayerState.setPosture, cancellationToken: cts);
+            //await UniTask.WaitUntil(() => 
+            //gameManager.MyPlayerView.duelManager.setPosture && 
+            //gameManager.OpponentPlayerView.duelManager.setPosture, 
+            //cancellationToken: cts);
         }
     }
 }

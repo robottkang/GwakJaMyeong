@@ -16,15 +16,15 @@ namespace Room
         private GameObject counterField;
         
         [field:SerializeField]public StrategyPlan[] StrategyPlans { get; private set; } = new StrategyPlan[3];
-        public PlayerState MyPlayerState { get; private set; }
-        public PlayerState OpponentPlayerState { get; private set; }
+        public PlayerView MyPlayerView { get; private set; }
+        public PlayerView OpponentPlayerView { get; private set; }
 
 
         private void Awake()
         {
             Instance = this;
             
-            MyPlayerState = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity).GetComponent<PlayerState>();
+            MyPlayerView = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity).GetComponent<PlayerView>();
         }
 
         private void Start()
@@ -34,12 +34,12 @@ namespace Room
 
         private void Update()
         {
-            if (OpponentPlayerState == null)
+            if (OpponentPlayerView == null)
             {
-                foreach (var playerState in FindObjectsOfType<PlayerState>())
+                foreach (var playerView in FindObjectsOfType<PlayerView>())
                 {
-                    if (playerState == MyPlayerState) return;
-                    OpponentPlayerState = playerState;
+                    if (playerView == MyPlayerView) return;
+                    OpponentPlayerView = playerView;
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace Room
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
-            OpponentPlayerState = null;
+            OpponentPlayerView = null;
 
             if (PhaseManager.Instance.CurrentPhase != Phase.WaitPlayer)
             {
