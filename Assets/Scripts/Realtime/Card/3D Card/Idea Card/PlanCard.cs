@@ -88,7 +88,7 @@ namespace Card
                 // if PlacedCard is null
                 else if (strategyPlan.PlacedCardInfo == null)
                 {
-                    strategyPlan.PlacedCardInfo = CardInfo;
+                    strategyPlan.PlacedCardInfo = CardInfo as PlanCardInfo;
                     CurrentStrategyPlan.ClearStrategyPlan();
                 }
                 // if PlacedCard is not null, trade card
@@ -145,6 +145,18 @@ namespace Card
                 case Phase.Duel:
                     break;
             }
+        }
+    }
+
+    public class PlanCardInfo : CardInfo
+    {
+        public CardState cardState = CardState.Placed;
+
+        public enum CardState
+        {
+            Placed,
+            Opened,
+            Turned,
         }
     }
 }

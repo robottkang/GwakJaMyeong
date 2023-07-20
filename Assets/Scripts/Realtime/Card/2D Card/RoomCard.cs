@@ -43,7 +43,7 @@ namespace Card
             StrategyPlan strategyPlan;
             if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
             {
-                strategyPlan.PlacedCardInfo = CardInfo;
+                strategyPlan.PlacedCardInfo = CardInfo as PlanCardInfo;
                 ObjectPool.ReturnObject("Hand Pool", gameObject);
             }
             else

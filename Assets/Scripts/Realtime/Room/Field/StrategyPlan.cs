@@ -42,17 +42,5 @@ namespace Room
                 ObjectPool.ReturnObject("Card Pool", placedCardObject);
             placedCardObject = null;
         }
-
-        public class PlanCardInfo : CardInfo
-        {
-            public CardState cardState = CardState.Placed;
-
-            public enum CardState
-            {
-                Placed,
-                Opened,
-                Turned,
-            }
-        }
     }
 }
