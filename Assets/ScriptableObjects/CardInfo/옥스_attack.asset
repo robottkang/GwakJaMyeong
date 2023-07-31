@@ -12,33 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d64c780327d1f94590469e2f07dedef, type: 3}
   m_Name: "\uC625\uC2A4_attack"
   m_EditorClassIdentifier: 
+  cardCode: 14
   cardSprite: {fileID: -924019559, guid: b735e712bc2d3eb4b9f31eae6d2be659, type: 3}
   attack: 0
   guardPoint: 0
-  damage: 0
-  requiredPosture: 0
+  damage: 2
+  requiredPosture: -1
   finishingPosture: 0
-  OnCardOpen:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnCardTurn:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCardSum:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCardEffect:
-    m_PersistentCalls:
-      m_Calls: []

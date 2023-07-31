@@ -8,7 +8,9 @@ namespace Card
 {
     public class RoomCard : DragalbeCard
     {
-        bool canMove = true;
+        [SerializeField]
+        private GameObject planCardPrefab;
+        private bool canMove = true;
 
         protected override void Awake()
         {
@@ -41,9 +43,11 @@ namespace Card
             Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field"));
 
             StrategyPlan strategyPlan;
-            if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
+            if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedPlanCard == null)
             {
-                strategyPlan.PlacedCardInfo = CardInfo as PlanCardInfo;
+                GameObject planCard = ObjectPool.GetObject("Card Pool", planCardPrefab);
+                planCard.GetComponent<PlanCard>().CardInfo = CardInfo;
+                strategyPlan.PlaceCard(planCard);
                 ObjectPool.ReturnObject("Hand Pool", gameObject);
             }
             else

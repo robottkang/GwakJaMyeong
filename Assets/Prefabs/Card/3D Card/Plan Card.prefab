@@ -133,7 +133,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardSprite: {fileID: 981924963104682437}
   backgroundSprite: {fileID: 981924964279271716}
-  cardInfo: {fileID: 11400000, guid: 83bda99da67240c4d83b2c7067f9445a, type: 2}
+  cardInfo: {fileID: 0}
   currentStrategyPlan: {fileID: 0}
 --- !u!65 &1055142894489892542
 BoxCollider:

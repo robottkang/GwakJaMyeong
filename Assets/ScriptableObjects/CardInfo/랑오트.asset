@@ -12,21 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d64c780327d1f94590469e2f07dedef, type: 3}
   m_Name: "\uB791\uC624\uD2B8"
   m_EditorClassIdentifier: 
+  cardCode: 2
   cardSprite: {fileID: -317222441, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
-  attack: 8
+  attack: 4
   guardPoint: 0
   damage: 2
   requiredPosture: 6
   finishingPosture: 6
-  OnCardOpen:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCardTurn:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCardSum:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCardEffect:
-    m_PersistentCalls:
-      m_Calls: []

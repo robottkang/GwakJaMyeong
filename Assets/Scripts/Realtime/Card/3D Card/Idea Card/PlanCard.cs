@@ -1,4 +1,5 @@
 using Room;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,33 +8,42 @@ namespace Card
 {
     public class PlanCard : MonoBehaviour
     {
+        private Camera mainCamera;
         [SerializeField]
         private SpriteRenderer cardSprite;
         [SerializeField]
         private SpriteRenderer backgroundSprite;
-        [SerializeField]
+        [SerializeField, ReadOnly]
         private CardInfo cardInfo;
-        private Vector3 originPosition;
+        private DuelData duelData;
+        public Action<FieldController, FieldController> onCardOpen;
+        public Action<FieldController, FieldController> onCardTurn;
+        public Action<FieldController, FieldController> onCardSumStart;
+        public Action<FieldController, FieldController> onCardSum;
+        public Action<FieldController, FieldController> onCardSumEnd;
         [SerializeField, ReadOnly]
         private StrategyPlan currentStrategyPlan;
-
-        private Camera mainCamera;
+        private Vector3 originPosition;
 
         public SpriteRenderer CardSprite => cardSprite;
         public SpriteRenderer BackgroundSprite => backgroundSprite;
+        public int DamageDelta
+        {
+            get => duelData.damageDelta;
+            set
+            {
+                if (cardInfo.ThisCardCode == CardInfo.CardCode.Jonhau && value < 0) return;
+                duelData.damageDelta = value;
+            }
+        }
+        public int Defense { get => duelData.defense; set => duelData.defense = value; }
+        public bool IsNotInvaild { get => duelData.isNotInvaild; set => duelData.isNotInvaild = value; }
+        public bool Invaildated { get => duelData.invaildated; set => duelData.invaildated = value; }
+        public CardDeployment CurrentCardDeployment { get => duelData.currentCardDeployment; set => duelData.currentCardDeployment = value; }
         public StrategyPlan CurrentStrategyPlan
         {
             get => currentStrategyPlan;
-            set
-            {
-                currentStrategyPlan = value;
-
-                if (value != null)
-                {
-                    CardInfo = CurrentStrategyPlan.PlacedCardInfo;
-                    cardSprite.color = new(1f, 1f, 1f, 0.5f);
-                }
-            }
+            set => currentStrategyPlan = value;
         }
         public CardInfo CardInfo
         {
@@ -41,9 +51,18 @@ namespace Card
             set
             {
                 cardInfo = value;
-                
-                if (value != null) cardSprite.sprite = cardInfo.CardSprite;
-                else Debug.LogWarning("null is invaild for cardInfo");
+
+                if (value == null)
+                {
+                    Debug.LogWarning("null is invaild for cardInfo");
+                    return;
+                }
+                cardSprite.sprite = cardInfo.CardSprite;
+                onCardOpen = cardInfo.Open;
+                onCardTurn = cardInfo.Turn;
+                onCardSumStart = cardInfo.SumStart;
+                onCardSum = cardInfo.Sum;
+                onCardSumEnd = cardInfo.SumEnd;
             }
         }
 
@@ -52,8 +71,20 @@ namespace Card
             mainCamera = Camera.main;
         }
 
-        private void OnDisable()
+        private void OnEnable()
         {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            duelData = new DuelData() {
+                damageDelta = 0,
+                defense = 0,
+                isNotInvaild = false,
+                invaildated = false,
+                currentCardDeployment = CardDeployment.Placed
+            };
             CurrentStrategyPlan = null;
             cardSprite.color = Color.white;
         }
@@ -85,19 +116,10 @@ namespace Card
                     transform.position = originPosition;
                     return;
                 }
-                // if PlacedCard is null
-                else if (strategyPlan.PlacedCardInfo == null)
+                // if Card moves to other StrategyPlan
+                else
                 {
-                    strategyPlan.PlacedCardInfo = CardInfo as PlanCardInfo;
-                    CurrentStrategyPlan.ClearStrategyPlan();
-                }
-                // if PlacedCard is not null, trade card
-                else if (strategyPlan.PlacedCardInfo != null)
-                {
-                    PlanCard targetPlanCard = strategyPlan.PlacedCardObejct.GetComponent<PlanCard>();
-                    (CardInfo, targetPlanCard.CardInfo) = (targetPlanCard.CardInfo, CardInfo);
-                    transform.position = originPosition;
-                    return;
+                    CurrentStrategyPlan.TradeCard(strategyPlan);
                 }
             }
             else
@@ -108,12 +130,14 @@ namespace Card
             }
         }
         #endregion
+
         #region Duel Phase
 
         #endregion
+
         private void OnMouseDown()
         {
-            switch (PhaseManager.Instance.CurrentPhase)
+            switch (PhaseManager.CurrentPhase)
             {
                 case Phase.StrategyPlan:
                     PickUp();
@@ -125,7 +149,7 @@ namespace Card
 
         private void OnMouseDrag()
         {
-            switch (PhaseManager.Instance.CurrentPhase)
+            switch (PhaseManager.CurrentPhase)
             {
                 case Phase.StrategyPlan:
                     Move();
@@ -137,7 +161,7 @@ namespace Card
 
         private void OnMouseUp()
         {
-            switch (PhaseManager.Instance.CurrentPhase)
+            switch (PhaseManager.CurrentPhase)
             {
                 case Phase.StrategyPlan:
                     Drop();
@@ -146,17 +170,22 @@ namespace Card
                     break;
             }
         }
+
+        private struct DuelData
+        {
+            public int damageDelta;
+            public int defense;
+            public bool isNotInvaild;
+            public bool invaildated;
+            public CardDeployment currentCardDeployment;
+        }
     }
 
-    public class PlanCardInfo : CardInfo
+    [Flags]
+    public enum CardDeployment
     {
-        public CardState cardState = CardState.Placed;
-
-        public enum CardState
-        {
-            Placed,
-            Opened,
-            Turned,
-        }
+        Placed = 0,
+        Opened = 1,
+        Turned = 2,
     }
 }

@@ -2,13 +2,34 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using Card.Types;
+using Room;
 
 namespace Card
 {
     [CreateAssetMenu(fileName = "New CardInfo", menuName = "Card/CardInfo")]
     public class CardInfo : ScriptableObject
     {
+        [SerializeField]
+        protected CardCode cardCode;
+        private readonly Dictionary<CardCode, ICardEffect> cardTypes = new()
+        {
+            { CardCode.Aufschtraechen, new Aufschtraechen() },
+            { CardCode.Boudun, new Boudun() },
+            { CardCode.Duhbacel, new Duhbacel() },
+            { CardCode.Dupliaren, new Dupliaren() },
+            { CardCode.Haeng, new Haeng() },
+            { CardCode.Johnhoot, new Johnhoot() },
+            { CardCode.Jonhau, new Jonhau() },
+            { CardCode.Krumphau, new Krumphau() },
+            { CardCode.Rangote, new Rangote() },
+            { CardCode.Shaitelhau, new Shaitelhau() },
+            { CardCode.Shilhau, new Shilhau() },
+            { CardCode.Shulschel, new Shulschel() },
+            { CardCode.Velpuren, new Velpuren() },
+            { CardCode.Zverkhau, new Zverkhau() },
+            { CardCode.Ochs_Attack, new Ochs_Attack() }
+        };
         [SerializeField]
         protected Sprite cardSprite;
 
@@ -19,65 +40,73 @@ namespace Card
         [SerializeField]
         protected int damage;
         [SerializeField]
-        protected Posture requiredPosture;
+        protected Posture.Posture requiredPosture = (Posture.Posture)(-1);
         [SerializeField]
-        protected Posture finishingPosture;
-        protected bool canBeInvaild;
+        protected Posture.Posture finishingPosture;
 
-        public string CardName => cardSprite.name;
+        public CardCode ThisCardCode => cardCode;
         public Sprite CardSprite => cardSprite;
         public int Damage => damage;
         public AttackType Attack => attack;
         public AttackType GuardPoint => guardPoint;
-        public bool CanBeInvaild => canBeInvaild;
+        public Posture.Posture RequiredPosture => requiredPosture;
+        public Posture.Posture FinishingPosture => finishingPosture;
 
-        public UnityEvent onCardOpen = new();
-        public UnityEvent onCardTurn = new();
-        public UnityEvent onCardSum = new();
-        public UnityEvent onCardEffect = new();
+        public void Open(FieldController me, FieldController target) => cardTypes[cardCode].Open(me, target);
+        public void Turn(FieldController me, FieldController target) => cardTypes[cardCode].Turn(me, target);
+        public void SumStart(FieldController me, FieldController target) => cardTypes[cardCode].SumStart(me, target);
+        public void Sum(FieldController me, FieldController target) => cardTypes[cardCode].Sum(me, target);
+        public void SumEnd(FieldController me, FieldController target) => cardTypes[cardCode].SumEnd(me, target);
 
         [Flags]
         public enum AttackType
         {
-            none = 0,
+            None = 0,
             /// <summary>
             /// 내려베기
             /// </summary>
-            uberhauw = 1,
+            DownwardCut = 1,
             /// <summary>
             /// 올려베기
             /// </summary>
-            unterhau = 2,
-            /// <summary>
-            /// 횡베기
-            /// </summary>
-            horizontal = 4,
+            UpwardCut = 2,
             /// <summary>
             /// 찌르기
             /// </summary>
-            stechen = 8,
+            Stab = 4,
+            /// <summary>
+            /// 횡베기
+            /// </summary>
+            HorizontalCut = 8,
         }
 
-        [Flags]
-        public enum Posture
+
+        public enum CardCode
         {
-            None = 0,
-            /// <summary>
-            /// 세로
-            /// </summary>
-            VomTag = 1,
-            /// <summary>
-            /// 대각선
-            /// </summary>
-            Pflug = 2,
-            /// <summary>
-            /// 가로
-            /// </summary>
-            Ochs = 4,
-            /// <summary>
-            /// 뒤
-            /// </summary>
-            Alber = 8,
+            Duhbacel,
+            Dupliaren,
+            Rangote,
+            Velpuren,
+            Boudun,
+            Shaitelhau,
+            Shilhau,
+            Shulschel,
+            Aufschtraechen,
+            Jonhau,
+            Johnhoot,
+            Zverkhau,
+            Krumphau,
+            Haeng,
+            Ochs_Attack,
         }
+    }
+
+    public interface ICardEffect
+    {
+        public void Open(FieldController me, FieldController opponent);
+        public void Turn(FieldController me, FieldController opponent);
+        public void SumStart(FieldController me, FieldController opponent);
+        public void Sum(FieldController me, FieldController opponent);
+        public void SumEnd(FieldController me, FieldController opponent);
     }
 }
