@@ -48,9 +48,10 @@ namespace Room
                     cardStackController.StackCard(9);
                 }
 
-                this.Draw(PhaseManager.Instance.TurnCount == 1 ? firstDrawCount : defaultDrawCount);
+                this.Draw(defaultDrawCount);
             }
 
+            PhaseEventBus.Subscribe(Phase.BeforeStart, () => this.Draw(firstDrawCount));
             PhaseEventBus.Subscribe(Phase.Draw, Draw);
         }
 
@@ -78,7 +79,7 @@ namespace Room
             string debugCardOrder = "shuffled card: ";
             foreach (var card in resultCardsList)
             {
-                debugCardOrder += '\n' + card.CardName;
+                debugCardOrder += '\n' + card.ThisCardCode;
             }
             Debug.Log(debugCardOrder);
 #endif
