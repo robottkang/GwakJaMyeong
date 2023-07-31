@@ -29,8 +29,8 @@ namespace Room
         {
             for (int i = 0; i < 3; i++)
             {
-                cardsInDust.Enqueue(GameManager.Instance.StrategyPlans[i].PlacedCardInfo);
-                GameManager.Instance.StrategyPlans[i].ClearStrategyPlan();
+                cardsInDust.Enqueue(PlayerController.Instance.GetCard(i).CardInfo);
+                PlayerController.Instance.GetCard(i).CurrentStrategyPlan.ClearStrategyPlan();
             }
 
             cardStackController.StackCard(3);
