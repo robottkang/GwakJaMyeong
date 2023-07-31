@@ -38,7 +38,7 @@ namespace DeckBuilding
                 string debugCardList = "Card list: ";
                 foreach (var card in Room.DeckController.deckList)
                 {
-                    debugCardList += '\n' + card.CardName;
+                    debugCardList += '\n' + card.ThisCardCode;
                 }
                 Debug.Log(debugCardList);
 #endif

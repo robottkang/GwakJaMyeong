@@ -48,7 +48,7 @@ namespace Room
 
         public void DrawCard(int count)
         {
-            while (count > 0)
+            while (count > 0 && lastCardIndex >= 0)
             {
                 cardObjects[lastCardIndex].SetActive(false);
 
@@ -59,7 +59,7 @@ namespace Room
 
         public void StackCard(int count)
         {
-            while (count > 0)
+            while (count > 0 && lastCardIndex < cardObjects.Count)
             {
                 lastCardIndex += 1;
                 count -= 1;
