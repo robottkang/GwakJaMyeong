@@ -9,20 +9,20 @@ namespace Card
     public class DragalbeCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField]
-        private CardInfo cardInfo;
+        private CardData cardData;
         protected Vector3 offset;
         private Vector3 originPosition;
         private Transform originParent;
 
         protected Image image;
 
-        public CardInfo CardInfo
+        public CardData CardData
         {
-            get => cardInfo;
+            get => cardData;
             set
             {
-                cardInfo = value;
-                if (value != null) image.sprite = cardInfo.CardSprite;
+                cardData = value;
+                if (value != null) image.sprite = cardData.CardSprite;
                 else Debug.LogWarning("null is invaild for cardInfo");
             }
         }
@@ -37,7 +37,7 @@ namespace Card
         protected virtual void Start()
         {
             originParent = transform.parent;
-            image.sprite = cardInfo.CardSprite;
+            image.sprite = cardData.CardSprite;
         }
 
         public virtual void OnBeginDrag(PointerEventData eventData)

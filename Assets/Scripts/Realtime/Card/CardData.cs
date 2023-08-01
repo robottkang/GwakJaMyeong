@@ -8,7 +8,7 @@ using Room;
 namespace Card
 {
     [CreateAssetMenu(fileName = "New CardInfo", menuName = "Card/CardInfo")]
-    public class CardInfo : ScriptableObject
+    public class CardData : ScriptableObject
     {
         [SerializeField]
         protected CardCode cardCode;

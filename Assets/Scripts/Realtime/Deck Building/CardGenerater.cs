@@ -8,7 +8,7 @@ namespace DeckBuilding
     public class CardGenerater : MonoBehaviour
     {
         [SerializeField]
-        private CardInfo cardInfo;
+        private CardData cardData;
         [SerializeField]
         private GameObject card;
 
@@ -17,7 +17,7 @@ namespace DeckBuilding
             for (int i = 0; i < 3; i++)
             {
                 var generatedCard = Instantiate(card, transform);
-                generatedCard.GetComponent<DeckBuildingCard>().CardInfo = cardInfo;
+                generatedCard.GetComponent<DeckBuildingCard>().CardData = cardData;
             }
         }
     }

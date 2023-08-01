@@ -43,10 +43,10 @@ namespace Card
             Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field"));
 
             StrategyPlan strategyPlan;
-            if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedPlanCard == null)
+            if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedPlanCardOnTop == null)
             {
                 GameObject planCard = ObjectPool.GetObject("Card Pool", planCardPrefab);
-                planCard.GetComponent<PlanCard>().CardInfo = CardInfo;
+                planCard.GetComponent<PlanCard>().CardData = CardData;
                 strategyPlan.PlaceCard(planCard);
                 ObjectPool.ReturnObject("Hand Pool", gameObject);
             }

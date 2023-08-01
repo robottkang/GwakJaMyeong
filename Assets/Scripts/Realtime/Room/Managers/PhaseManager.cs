@@ -181,16 +181,16 @@ namespace Room
 
         public bool CheckStrategyPlanReady()
         {
-            Card.CardInfo[] cardInfos = new Card.CardInfo[3];
+            Card.CardData[] cardsData = new Card.CardData[3];
             for (int i = 0; i < 3; i++)
             {
                 if (PlayerController.Instance.GetCard(i) == null)
                     return false;
-                cardInfos[i] = PlayerController.Instance.GetCard(i).CardInfo;
+                cardsData[i] = PlayerController.Instance.GetCard(i).CardData;
             }
 
-            PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardInfos,
-                cardInfos,
+            PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardsData,
+                cardsData,
                 RaiseEventOptions.Default,
                 SendOptions.SendReliable);
             return true;

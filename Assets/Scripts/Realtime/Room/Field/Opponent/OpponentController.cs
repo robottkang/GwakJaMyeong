@@ -84,13 +84,13 @@ namespace Room.Opponent
                 IsReadyToPlay = (bool)photonEvent.CustomData;
             }
 
-            if (photonEvent.Code == (byte)DuelEventCode.SendCardInfos && PhaseManager.CurrentPhase == Phase.StrategyPlan)
+            if (photonEvent.Code == (byte)DuelEventCode.SendCardsData && PhaseManager.CurrentPhase == Phase.StrategyPlan)
             {
-                var planCards = (Card.CardInfo[])photonEvent.CustomData;
+                var planCards = (Card.CardData[])photonEvent.CustomData;
                 for (int i = 0; i < planCards.Length; i++)
                 {
                     GameObject planCard = ObjectPool.GetObject("Card Pool", planCardPrefab);
-                    planCard.GetComponent<Card.PlanCard>().CardInfo = planCards[i];
+                    planCard.GetComponent<Card.PlanCard>().CardData = planCards[i];
                     PlaceCard(planCard);
                 }
                 IsReadyPlanCard = true;

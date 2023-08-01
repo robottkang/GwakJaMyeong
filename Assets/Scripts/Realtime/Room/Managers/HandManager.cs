@@ -20,12 +20,12 @@ namespace Room
             Instance = this;
         }
 
-        public void AddCard(CardInfo cardInfo)
+        public void AddCard(CardData cardData)
         {
             var cardObject = ObjectPool.GetObject(handPoolName, handCardPrefab, transform);
             cardObject.GetComponent<RectTransform>().sizeDelta = handCardPrefab.GetComponent<RectTransform>().sizeDelta * 0.8f;
 
-            cardObject.GetComponent<RoomCard>().CardInfo = cardInfo;
+            cardObject.GetComponent<RoomCard>().CardData = cardData;
         }
     }
 }

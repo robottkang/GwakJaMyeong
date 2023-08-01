@@ -32,7 +32,7 @@ namespace DeckBuilding
 
                 for (int i = 0; i < inventory.transform.childCount; i++)
                 {
-                    Room.DeckController.deckList.Add(inventory.transform.GetChild(i).GetComponent<DragalbeCard>().CardInfo);
+                    Room.DeckController.deckList.Add(inventory.transform.GetChild(i).GetComponent<DragalbeCard>().CardData);
                 }
 #if UNITY_EDITOR
                 string debugCardList = "Card list: ";

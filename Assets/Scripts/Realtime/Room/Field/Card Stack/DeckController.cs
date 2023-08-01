@@ -9,7 +9,7 @@ namespace Room
     public class DeckController : MonoBehaviour
     {
 #if UNITY_EDITOR
-        [SerializeField] private List<CardInfo> testCardList;
+        [SerializeField] private List<CardData> testCardList;
         [Button] private void SetCard()
         {
             if (!Application.isPlaying) return;
@@ -27,10 +27,10 @@ namespace Room
         [SerializeField]
         private int defaultDrawCount = 3;
 
-        public static List<CardInfo> deckList = new(11);
-        private List<CardInfo> deck = new(11);
+        public static List<CardData> deckList = new(11);
+        private List<CardData> deck = new(11);
 
-        public CardInfo[] Deck => deck.ToArray();
+        public CardData[] Deck => deck.ToArray();
         
         
         private void Awake()
@@ -65,9 +65,9 @@ namespace Room
         /// </summary>
         /// <param name="cards">the cards to shuffle</param>
         /// <returns>return the shuffled cards</returns>
-        public List<CardInfo> Shuffle(List<CardInfo> cards)
+        public List<CardData> Shuffle(List<CardData> cards)
         {
-            List<CardInfo> resultCardsList = new(cards.Count);
+            List<CardData> resultCardsList = new(cards.Count);
             
             while (cards.Count > 0)
             {

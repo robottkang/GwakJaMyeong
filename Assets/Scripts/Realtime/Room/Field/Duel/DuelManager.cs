@@ -61,7 +61,7 @@ namespace Room
     {
         Ready,
         SetActionToken,
-        SendCardInfos,
+        SendCardsData,
         SendMyPosture,
         SendOpponentPosture,
         SendCardDepolyment,
