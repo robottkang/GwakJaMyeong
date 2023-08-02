@@ -60,14 +60,4 @@ namespace Room
             }
         }
     }
-
-    public enum Phase
-    {
-        BeforeStart,
-        Launch,
-        Draw,
-        StrategyPlan,
-        Duel,
-        End,
-    }
 }

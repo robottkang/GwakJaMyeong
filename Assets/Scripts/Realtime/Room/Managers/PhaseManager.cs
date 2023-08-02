@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,6 +9,7 @@ using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using Room.Opponent;
 
 namespace Room
 {
@@ -16,7 +18,6 @@ namespace Room
 #if UNITY_EDITOR
         [EasyButtons.Button] private void ChangePhaseTest(int phase) => CurrentPhase = (Phase)phase;
 #endif
-        private bool getsActionToken = false;
         private UniTask phaseChangingTask;
         private CancellationTokenSource cts = new();
         private UnityEvent onRecallDuringPhaseChanging = new();
@@ -76,13 +77,13 @@ namespace Room
                 Phase.End => EndPhase(cts.Token),
                 _ => UniTask.Create(() => throw new NotImplementedException()),
             };
-            phaseChangingTask.Forget();
         }
 
-        private void CancelChangingPhase()
+        private void CancelPhaseChanging()
         {
             cts.Cancel();
             cts = new();
+            phaseChangingTask = UniTask.CompletedTask;
         }
 
         #region BeforeStartPhase
@@ -99,7 +100,7 @@ namespace Room
                 RaiseEventOptions.Default,
                 SendOptions.SendReliable);
             onRecallDuringPhaseChanging.AddListener(StopWaitingPlayer);
-            await UniTask.WaitUntil(() => Opponent.OpponentController.Instance.IsReadyToPlay, cancellationToken: token);
+            await UniTask.WaitUntil(() => OpponentController.Instance.IsReadyToPlay, cancellationToken: token);
         }
 
         private void StopWaitingPlayer()
@@ -109,7 +110,7 @@ namespace Room
                 RaiseEventOptions.Default,
                 SendOptions.SendReliable);
 
-            CancelChangingPhase();
+            CancelPhaseChanging();
         }
         #endregion
 
@@ -117,8 +118,6 @@ namespace Room
         private async UniTask LaunchPhase(CancellationToken token)
         {
             if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
-            await UniTask.WaitUntil(() => getsActionToken, cancellationToken: token);
-
             await ChooseOpeningPosture(token);
             CurrentPhase = Phase.StrategyPlan;
         }
@@ -127,39 +126,19 @@ namespace Room
         {
             bool coin = UnityEngine.Random.Range(0, 2) > 0;
 
-            PhotonNetwork.RaiseEvent((byte)DuelEventCode.SetActionToken,
-                !coin,
-                new RaiseEventOptions { Receivers = ReceiverGroup.Others },
-                SendOptions.SendReliable);
-            PhotonNetwork.RaiseEvent((byte)DuelEventCode.SetActionToken,
-                coin,
-                new RaiseEventOptions { Receivers = ReceiverGroup.MasterClient },
-                SendOptions.SendReliable);
+            DuelManager.SetActionToken(coin);
+            Debug.Log("Coin Toss: " + (coin ? "mine" : "opponent"));
         }
 
         public async UniTask ChooseOpeningPosture(CancellationToken token)
         {
-            var myPostureChooseTask = UniTask.Create(async () =>
-            {
-                PlayerController.Instance.PostureController.SelectPosture();
-                await UniTask.WaitUntil(() => PlayerController.Instance.PostureController.IsPostureChanging, cancellationToken: token);
-            });
-            var opponentPostureChooseTask = UniTask.Create(async () =>
-            {
-                Opponent.OpponentController.Instance.PostureController.SelectPosture();
-                await UniTask.WaitUntil(() => Opponent.OpponentController.Instance.PostureController.IsPostureChanging, cancellationToken: token);
-            });
+            OpponentController.Instance.PostureController.SelectPosture();
+            await UniTask.WaitUntil(() => DuelManager.HasActionToken, cancellationToken: token);
 
-            if (DuelManager.HasActionToken)
-            {
-                await myPostureChooseTask;
-                await opponentPostureChooseTask;
-            }
-            else
-            {
-                await opponentPostureChooseTask;
-                await myPostureChooseTask;
-            }
+            PlayerController.Instance.PostureController.SelectPosture();
+            await UniTask.WaitUntil(() => !PlayerController.Instance.PostureController.IsPostureChanging, cancellationToken: token);
+            DuelManager.SwapActionToken();
+            await UniTask.WaitUntil(() => !OpponentController.Instance.PostureController.IsPostureChanging, cancellationToken: token);
         }
         #endregion
 
@@ -175,24 +154,31 @@ namespace Room
         {
             DuelManager.ResetStrategyPlanOrder();
             if (!CheckStrategyPlanReady()) return;
-            await UniTask.WaitUntil(() => Opponent.OpponentController.Instance.IsReadyPlanCard, cancellationToken: token);
+            await UniTask.WaitUntil(() => OpponentController.Instance.IsReadyPlanCard, cancellationToken: token);
             CurrentPhase = Phase.Duel;
         }
 
         public bool CheckStrategyPlanReady()
         {
             Card.CardData[] cardsData = new Card.CardData[3];
+
             for (int i = 0; i < 3; i++)
             {
-                if (PlayerController.Instance.GetCard(i) == null)
+                Card.PlanCard planCard;
+                if ((planCard = PlayerController.Instance.GetCard(i)) == null)
                     return false;
-                cardsData[i] = PlayerController.Instance.GetCard(i).CardData;
+                cardsData[i] = planCard.CardData;
             }
 
-            PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardsData,
-                cardsData,
-                RaiseEventOptions.Default,
-                SendOptions.SendReliable);
+            for (int i = 0; i < 3; i++)
+            {
+                PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardsData,
+                    JsonUtility.ToJson(cardsData[i]),
+                    RaiseEventOptions.Default,
+                    SendOptions.SendReliable);
+            }
+
+            Debug.Log("Send cards data");
             return true;
         }
         #endregion
@@ -208,17 +194,22 @@ namespace Room
         private async UniTask EndPhase(CancellationToken token)
         {
             CurrentPhase = Phase.Draw;
-            ChangeNextPhase();
         }
         #endregion
 
         public void OnEvent(EventData photonEvent)
         {
-            if (photonEvent.Code == (byte)DuelEventCode.SetActionToken)
-            {
-                getsActionToken = true;
-            }
-        }
 
+        }
+    }
+
+    public enum Phase
+    {
+        BeforeStart,
+        Launch,
+        Draw,
+        StrategyPlan,
+        Duel,
+        End,
     }
 }
