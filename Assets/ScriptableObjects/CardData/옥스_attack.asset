@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d64c780327d1f94590469e2f07dedef, type: 3}
-  m_Name: "\uBCA8\uD4CC\uB80C"
+  m_Script: {fileID: 11500000, guid: 84324ec41d3c6b74295eca3af1a24787, type: 3}
+  m_Name: "\uC625\uC2A4_attack"
   m_EditorClassIdentifier: 
-  cardCode: 3
-  cardSprite: {fileID: -1212573128, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
-  attack: 1
+  cardCode: 14
+  cardSprite: {fileID: -924019559, guid: b735e712bc2d3eb4b9f31eae6d2be659, type: 3}
+  attack: 0
   guardPoint: 0
-  damage: 1
-  requiredPosture: 1
-  finishingPosture: 8
+  damage: 2
+  requiredPosture: -1
+  finishingPosture: 0

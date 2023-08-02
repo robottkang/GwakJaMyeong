@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d64c780327d1f94590469e2f07dedef, type: 3}
-  m_Name: "\uC290\uB93C\uC140"
+  m_Script: {fileID: 11500000, guid: 84324ec41d3c6b74295eca3af1a24787, type: 3}
+  m_Name: "\uBDD8\uB4E0"
   m_EditorClassIdentifier: 
-  cardCode: 7
-  cardSprite: {fileID: -217678080, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
+  cardCode: 4
+  cardSprite: {fileID: 1923786314, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   attack: 0
   guardPoint: 0
   damage: 0
