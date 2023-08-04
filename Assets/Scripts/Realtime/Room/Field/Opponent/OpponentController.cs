@@ -10,13 +10,13 @@ namespace Room.Opponent
     public class OpponentController : FieldController, IInRoomCallbacks, IOnEventCallback
     {
         [SerializeField]
-        private GameObject planCardPrefab;
-        [SerializeField]
         private CardStackController deck;
         [SerializeField]
         private CardStackController dust;
+        private int planCardOrder = 0;
         public bool IsReadyToPlay { get; private set; } = false;
-        public bool IsReadyPlanCard { get; private set; } = false;
+        public bool IsReadyPlanCard { get; set; } = false;
+        public override FieldController OpponentField => PlayerController.Instance;
 
         public static OpponentController Instance { get; private set; }
 
@@ -86,14 +86,21 @@ namespace Room.Opponent
 
             if (photonEvent.Code == (byte)DuelEventCode.SendCardsData && PhaseManager.CurrentPhase == Phase.StrategyPlan)
             {
-                var planCards = (Card.CardData[])photonEvent.CustomData;
-                for (int i = 0; i < planCards.Length; i++)
+                Card.CardData cardData = ScriptableObject.CreateInstance<Card.CardData>();
+                JsonUtility.FromJsonOverwrite((string)photonEvent.CustomData, cardData);
+                Debug.Log($" Receive {cardData.ThisCardCode}");
+
+                GameObject planCardObj = ObjectPool.GetObject("Card Pool");
+                planCardObj.GetComponent<Card.PlanCard>().Initialize(cardData, this);
+                planCardObj.GetComponent<Card.PlanCard>().CanMove = false;
+                StrategyPlans[planCardOrder].PlaceCard(planCardObj);
+
+                planCardOrder += 1;
+                if (planCardOrder == 3)
                 {
-                    GameObject planCard = ObjectPool.GetObject("Card Pool", planCardPrefab);
-                    planCard.GetComponent<Card.PlanCard>().CardData = planCards[i];
-                    PlaceCard(planCard);
+                    IsReadyPlanCard = true;
+                    planCardOrder = 0;
                 }
-                IsReadyPlanCard = true;
             }
         }
     }

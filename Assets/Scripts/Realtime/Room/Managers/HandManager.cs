@@ -22,7 +22,7 @@ namespace Room
 
         public void AddCard(CardData cardData)
         {
-            var cardObject = ObjectPool.GetObject(handPoolName, handCardPrefab, transform);
+            var cardObject = ObjectPool.GetObject(handPoolName, transform);
             cardObject.GetComponent<RectTransform>().sizeDelta = handCardPrefab.GetComponent<RectTransform>().sizeDelta * 0.8f;
 
             cardObject.GetComponent<RoomCard>().CardData = cardData;

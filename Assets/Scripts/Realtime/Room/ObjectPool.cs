@@ -10,6 +10,8 @@ namespace Room
         private static Dictionary<string, ObjectPool> objectPoolList = new();
         [SerializeField]
         private string poolName;
+        [SerializeField]
+        private GameObject prefab;
         private Queue<GameObject> poolingObjectQueue = new();
 
         private void Awake()
@@ -29,25 +31,17 @@ namespace Room
         {
             ObjectPool pool = objectPoolList[poolName];
 
-            if (pool.poolingObjectQueue.Count <= 0) return null;
-
-            GameObject poolingObject = pool.poolingObjectQueue.Dequeue();
-            poolingObject.transform.SetParent(parent == null ? pool.transform.parent : parent);
-            poolingObject.SetActive(true);
-
-            return poolingObject;
-        }
-        public static GameObject GetObject(string poolName, GameObject prefab, Transform parent = null)
-        {
-            ObjectPool pool = objectPoolList[poolName];
-
             if (pool.poolingObjectQueue.Count > 0)
             {
-                return GetObject(poolName, parent);
+                GameObject poolingObject = pool.poolingObjectQueue.Dequeue();
+                poolingObject.transform.SetParent(parent == null ? pool.transform.parent : parent);
+                poolingObject.SetActive(true);
+
+                return poolingObject;
             }
             else
             {
-                return Instantiate(prefab, parent == null ? pool.transform.parent : parent);
+                return Instantiate(pool.prefab, parent == null ? pool.transform.parent : parent);
             }
         }
 

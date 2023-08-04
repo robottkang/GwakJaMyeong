@@ -1,21 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using System.Threading;
 
 namespace Room
 {
-    public class GameManager : MonoBehaviourPunCallbacks
+    public class RoomManager : MonoBehaviourPunCallbacks
     {
-        public static GameManager Instance { get; private set; }
-
-
-        private void Awake()
-        {
-            Instance = this;
-        }
+        private static bool isReadyToPlay = false;
+        public static bool IsReadyToPlay { get => isReadyToPlay; set => isReadyToPlay = value; }
 
         private void Start()
         {

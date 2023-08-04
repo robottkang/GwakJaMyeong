@@ -51,7 +51,7 @@ namespace Room
                 this.Draw(defaultDrawCount);
             }
 
-            PhaseEventBus.Subscribe(Phase.BeforeStart, () => this.Draw(firstDrawCount));
+            PhaseEventBus.Subscribe(Phase.Launch, () => this.Draw(firstDrawCount));
             PhaseEventBus.Subscribe(Phase.Draw, Draw);
         }
 
@@ -79,7 +79,7 @@ namespace Room
             string debugCardOrder = "shuffled card: ";
             foreach (var card in resultCardsList)
             {
-                debugCardOrder += '\n' + card.ThisCardCode;
+                debugCardOrder += '\n' + card.ThisCardCode.ToString();
             }
             Debug.Log(debugCardOrder);
 #endif

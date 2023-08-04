@@ -8,16 +8,8 @@ using Photon.Realtime;
 
 namespace Room.Opponent
 {
-    public class OpponentPostureController : MonoBehaviour, IOnEventCallback, IPostureController
+    public class OpponentPostureController : PostureController, IOnEventCallback
     {
-        private Posture prevPosture = Posture.None;
-        [SerializeField]
-        private PostureCard postureCard;
-        private bool isPostureChanging = false;
-
-        public Posture CurrentPosture => postureCard.CurrentPosture;
-        public bool IsPostureChanging => isPostureChanging;
-
         private void Awake()
         {
             PhotonNetwork.AddCallbackTarget(this);
@@ -35,7 +27,7 @@ namespace Room.Opponent
             isPostureChanging = false;
         }
 
-        public void ChangePosture(Posture posture)
+        public override void ChangePosture(Posture posture)
         {
             SetPosture(posture);
 
@@ -45,12 +37,12 @@ namespace Room.Opponent
                 SendOptions.SendReliable);
         }
 
-        public void SelectPosture(Posture availablePosture = (Posture)(-1))
+        public override void SelectPosture(Posture availablePosture = (Posture)(-1))
         {
             isPostureChanging = true;
         }
 
-        public void UndoPosture()
+        public override void UndoPosture()
         {
             ChangePosture(prevPosture);
         }

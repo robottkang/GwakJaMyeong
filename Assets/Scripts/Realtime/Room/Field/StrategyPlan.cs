@@ -9,9 +9,9 @@ namespace Room
     {
         private Stack<GameObject> placedCardObjects = new(2);
         [SerializeField, ReadOnly]
-        private PlanCard placedPlanCard;
+        private PlanCard firstPlacedPlanCard;
 
-        public PlanCard PlacedPlanCard
+        public PlanCard PlacedPlanCardOnTop
         {
             get
             {
@@ -19,10 +19,11 @@ namespace Room
                 else return placedCardObjects.Peek().GetComponent<PlanCard>();
             }
         }
+        public PlanCard FirstPlacedPlanCard => firstPlacedPlanCard;
 
         public void ClearStrategyPlan()
         {
-            placedPlanCard = null;
+            firstPlacedPlanCard = null;
 
             int count = placedCardObjects.Count;
             for (int i = 0; i < count; i++)
@@ -31,13 +32,16 @@ namespace Room
             }
         }
 
-        public void PlaceCard(GameObject planCard)
+        public void PlaceCard(GameObject obj)
         {
-            if (planCard == null) return;
+            if (obj == null) return;
 
-            placedPlanCard.CurrentStrategyPlan = this;
-            placedCardObjects.Push(planCard);
-
+            PlanCard planCard;
+            (planCard = obj.GetComponent<PlanCard>()).CurrentStrategyPlan = this;
+            if (placedCardObjects.Count == 0)
+                firstPlacedPlanCard = planCard;
+            placedCardObjects.Push(obj);
+            
             Vector3 position = transform.position +
                 (placedCardObjects.Count - 1) * Vector3.forward + 0.08f * placedCardObjects.Count * Vector3.up;
             placedCardObjects.Peek().transform.SetPositionAndRotation(position, Quaternion.Euler(0f, 0f, 0f));
