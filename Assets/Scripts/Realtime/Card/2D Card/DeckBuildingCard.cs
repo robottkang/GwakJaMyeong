@@ -2,20 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using DeckBuilding;
 
 namespace Card
 {
     public class DeckBuildingCard : DragalbeCard
     {
-        public override void OnEndDrag(PointerEventData eventData)
+        private bool isInInventroy = false;
+
+        public override void OnBeginDrag(PointerEventData eventData)
         {
-            if (!eventData.pointerCurrentRaycast.gameObject.TryGetComponent(out IDropHandler _))
+            if (isInInventroy)
+            {
+                Inventory.AddToInventory(gameObject);
+                isInInventroy = true;
+            }
+            else
             {
                 transform.position = OriginPosition;
-                transform.SetParent(OriginParent);
+                Inventory.RemoveFromInventory(gameObject);
+                isInInventroy = false;
             }
-            
-            base.OnEndDrag(eventData);
         }
+
+        public override void OnDrag(PointerEventData eventData) { }
+
+        public override void OnEndDrag(PointerEventData eventData) { }
     }
 }
