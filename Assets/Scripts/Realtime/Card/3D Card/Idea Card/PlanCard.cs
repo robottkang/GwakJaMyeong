@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Room;
 using System;
 using System.Collections;
@@ -6,6 +7,7 @@ using UnityEngine;
 
 namespace Card
 {
+    [Serializable]
     public class PlanCard : MonoBehaviour
     {
         private Camera mainCamera;
@@ -14,82 +16,82 @@ namespace Card
         [SerializeField]
         private SpriteRenderer backgroundSprite;
         [SerializeField, ReadOnly]
-        private CardInfo cardInfo;
-        private DuelData duelData;
-        public Action<FieldController, FieldController> onCardOpen;
-        public Action<FieldController, FieldController> onCardTurn;
-        public Action<FieldController, FieldController> onCardSumStart;
-        public Action<FieldController, FieldController> onCardSum;
-        public Action<FieldController, FieldController> onCardSumEnd;
+        private CardData cardData;
+        private CardDeployment currentCardDeployment;
+        public Action onCardOpen, onCardTurn, onCardSumStart, onCardSum;//, onCardSumEnd;
         [SerializeField, ReadOnly]
         private StrategyPlan currentStrategyPlan;
         private Vector3 originPosition;
 
-        public SpriteRenderer CardSprite => cardSprite;
-        public SpriteRenderer BackgroundSprite => backgroundSprite;
-        public int DamageDelta
+        public bool CanMove { get; set; } = false;
+        public int DamageBuff { get; set; }
+        public int DamageDebuff { get; set; }
+        public int Defense { get; set; }
+        public bool IsNotInvaild { get; set; }
+        public bool Invaildated { get; set; }
+        public FieldController MyFieldController { get; private set; }
+        public CardDeployment CurrentCardDeployment
         {
-            get => duelData.damageDelta;
+            get => currentCardDeployment;
             set
             {
-                if (cardInfo.ThisCardCode == CardInfo.CardCode.Jonhau && value < 0) return;
-                duelData.damageDelta = value;
+                currentCardDeployment = value;
+                switch (value)
+                {
+                    case CardDeployment.Placed:
+                        transform.SetPositionAndRotation(originPosition, Quaternion.Euler(0f, 0f, 0f));
+                        break;
+                    case CardDeployment.Opened:
+                        transform.DOLocalMove(0.5f * Vector3.forward, 0.5f);
+                        transform.DOLocalRotate(new Vector3(0f, 0f, 180f), 0.5f);
+                        break;
+                    case CardDeployment.Turned:
+                        transform.DOLocalMove(0.5f * Vector3.forward, 0.5f);
+                        transform.DOLocalRotate(new Vector3(0f, 90f, 0f), 0.5f);
+                        onCardTurn.Invoke();
+                        break;
+                    case CardDeployment.Disabled:
+                        transform.DOLocalMove(0.5f * Vector3.forward, 0.5f);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
-        public int Defense { get => duelData.defense; set => duelData.defense = value; }
-        public bool IsNotInvaild { get => duelData.isNotInvaild; set => duelData.isNotInvaild = value; }
-        public bool Invaildated { get => duelData.invaildated; set => duelData.invaildated = value; }
-        public CardDeployment CurrentCardDeployment { get => duelData.currentCardDeployment; set => duelData.currentCardDeployment = value; }
         public StrategyPlan CurrentStrategyPlan
         {
             get => currentStrategyPlan;
             set => currentStrategyPlan = value;
         }
-        public CardInfo CardInfo
-        {
-            get => cardInfo;
-            set
-            {
-                cardInfo = value;
-
-                if (value == null)
-                {
-                    Debug.LogWarning("null is invaild for cardInfo");
-                    return;
-                }
-                cardSprite.sprite = cardInfo.CardSprite;
-                onCardOpen = cardInfo.Open;
-                onCardTurn = cardInfo.Turn;
-                onCardSumStart = cardInfo.SumStart;
-                onCardSum = cardInfo.Sum;
-                onCardSumEnd = cardInfo.SumEnd;
-            }
-        }
+        public CardData CardData => cardData;
 
         private void Awake()
         {
             mainCamera = Camera.main;
+
+            PhaseEventBus.Subscribe(Phase.StrategyPlan, () => CanMove = true);
+            PhaseEventBus.Subscribe(Phase.Duel, () => CanMove = false);
         }
 
-        private void OnEnable()
+        public void Initialize(CardData cardData, FieldController myFieldController)
         {
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            duelData = new DuelData() {
-                damageDelta = 0,
-                defense = 0,
-                isNotInvaild = false,
-                invaildated = false,
-                currentCardDeployment = CardDeployment.Placed
-            };
+            DamageBuff = 0;
+            DamageDebuff = 0;
+            Defense = 0;
+            IsNotInvaild = false;
+            Invaildated = false;
+            currentCardDeployment = CardDeployment.Placed;
             CurrentStrategyPlan = null;
+            MyFieldController = myFieldController;
+            onCardOpen = () => cardData.Open(myFieldController, myFieldController.OpponentField);
+            onCardTurn = () => cardData.Turn(myFieldController, myFieldController.OpponentField);
+            onCardSumStart = () => cardData.SumStart(myFieldController, myFieldController.OpponentField);
+            onCardSum = () => cardData.Sum(myFieldController, myFieldController.OpponentField);
+            //onCardSumEnd = () => cardData.SumEnd(myFieldController, myFieldController.OpponentField);
+            cardSprite.sprite = cardData.CardSprite;
             cardSprite.color = Color.white;
         }
 
-        #region StrategyPlan Phase
         private void PickUp()
         {
             cardSprite.color = new(1f, 1f, 1f, 1f);
@@ -104,13 +106,13 @@ namespace Card
 
         private void Drop()
         {
-            Ray mouseRay = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field")))
+            // if Card moves to StrategyPlan
+            if (Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field")) &&
+                hitInfo.transform.TryGetComponent(out StrategyPlan strategyPlan))
             {
                 cardSprite.color = new(1f, 1f, 1f, 0.5f);
-                StrategyPlan strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>();
 
-                // if Card doesn't move
+                // if Card doesn't move out of your StrategyPlan
                 if (strategyPlan == CurrentStrategyPlan)
                 {
                     transform.position = originPosition;
@@ -124,68 +126,39 @@ namespace Card
             }
             else
             {
-                HandManager.Instance.AddCard(CardInfo);
+                HandManager.Instance.AddCard(CardData);
                 CurrentStrategyPlan.ClearStrategyPlan();
                 cardSprite.color = new(1f, 1f, 1f, 1f);
             }
         }
-        #endregion
-
-        #region Duel Phase
-
-        #endregion
 
         private void OnMouseDown()
         {
-            switch (PhaseManager.CurrentPhase)
-            {
-                case Phase.StrategyPlan:
-                    PickUp();
-                    break;
-                case Phase.Duel:
-                    break;
-            }
+            if (!CanMove) return;
+
+            PickUp();
         }
 
         private void OnMouseDrag()
         {
-            switch (PhaseManager.CurrentPhase)
-            {
-                case Phase.StrategyPlan:
-                    Move();
-                    break;
-                case Phase.Duel:
-                    break;
-            }
+            if (!CanMove) return;
+
+            Move();
         }
 
         private void OnMouseUp()
         {
-            switch (PhaseManager.CurrentPhase)
-            {
-                case Phase.StrategyPlan:
-                    Drop();
-                    break;
-                case Phase.Duel:
-                    break;
-            }
-        }
+            if (!CanMove) return;
 
-        private struct DuelData
-        {
-            public int damageDelta;
-            public int defense;
-            public bool isNotInvaild;
-            public bool invaildated;
-            public CardDeployment currentCardDeployment;
+            Drop();
         }
     }
 
-    [Flags]
     public enum CardDeployment
     {
-        Placed = 0,
-        Opened = 1,
-        Turned = 2,
+        Placed,
+        Opened,
+        Turned,
+        Disabled,
     }
 }

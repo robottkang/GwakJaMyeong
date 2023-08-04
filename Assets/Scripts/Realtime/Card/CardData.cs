@@ -7,7 +7,8 @@ using Room;
 
 namespace Card
 {
-    [CreateAssetMenu(fileName = "New CardInfo", menuName = "Card/CardInfo")]
+    [CreateAssetMenu(fileName = "New CardData", menuName = "Card/CardData")]
+    [Serializable]
     public class CardData : ScriptableObject
     {
         [SerializeField]
@@ -56,7 +57,7 @@ namespace Card
         public void Turn(FieldController me, FieldController target) => cardTypes[cardCode].Turn(me, target);
         public void SumStart(FieldController me, FieldController target) => cardTypes[cardCode].SumStart(me, target);
         public void Sum(FieldController me, FieldController target) => cardTypes[cardCode].Sum(me, target);
-        public void SumEnd(FieldController me, FieldController target) => cardTypes[cardCode].SumEnd(me, target);
+        //public void SumEnd(FieldController me, FieldController target) => cardTypes[cardCode].SumEnd(me, target);
 
         [Flags]
         public enum AttackType
@@ -107,6 +108,6 @@ namespace Card
         public void Turn(FieldController me, FieldController opponent);
         public void SumStart(FieldController me, FieldController opponent);
         public void Sum(FieldController me, FieldController opponent);
-        public void SumEnd(FieldController me, FieldController opponent);
+        //public void SumEnd(FieldController me, FieldController opponent);
     }
 }

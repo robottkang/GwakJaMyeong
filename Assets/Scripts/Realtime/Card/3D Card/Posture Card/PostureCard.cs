@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 namespace Card.Posture
 {
@@ -21,14 +22,14 @@ namespace Card.Posture
 
         private void RotatePosture(Posture posture)
         {
-            transform.rotation = posture switch
+            transform.DOLocalRotateQuaternion(posture switch
             {
                 Posture.VomTag => Quaternion.Euler(0, 0, 0),
                 Posture.Pflug => Quaternion.Euler(0, 45, 0),
                 Posture.Ochs => Quaternion.Euler(0, 90, 0),
                 Posture.Alber => Quaternion.Euler(0, 0, 180),
                 _ => throw new InvalidOperationException(),
-            };
+            }, 0.25f);
         }
     }
 

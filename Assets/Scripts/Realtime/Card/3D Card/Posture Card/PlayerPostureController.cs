@@ -6,25 +6,15 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Room
 {
-    public class PlayerPostureController : MonoBehaviour, IOnEventCallback, IPostureController
+    public class PlayerPostureController : PostureController, IOnEventCallback
     {
         private Camera mainCamera;
         [Header("- Posture Objects")]
         [SerializeField]
         private PostureInfo[] postureInfos = new PostureInfo[4];
-        [Header("- Posture Card")]
-        [SerializeField]
-        private PostureCard postureCard;
-        private Posture prevPosture = Posture.None;
-        private bool isPostureChanging = false;
-
-        public PostureCard PostureCard => postureCard;
-        public Posture CurrentPosture => postureCard.CurrentPosture;
-        public bool IsPostureChanging => isPostureChanging;
 
         private void Awake()
         {
@@ -42,8 +32,10 @@ namespace Room
         }
 
         // change the posture's data and transform depending on the mouse position when on mouse up
-        private void OnMouseUp()
+        private void Update()
         {
+            if (!Input.GetMouseButtonUp(0) && !isPostureChanging) return;
+
             Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit mouseRaycastHit, Mathf.Infinity, LayerMask.GetMask("Board"));
 
             Vector3 v = mouseRaycastHit.point - transform.position;
@@ -60,19 +52,18 @@ namespace Room
         {
             foreach (var postureInfo in postureInfos)
             {
-                // if postureObject is activeSelf and point is in the range of the angle
-                if (postureInfo.postureObject.activeSelf &&
-                    (postureInfo.startAngle < postureInfo.endAngle && postureInfo.startAngle <= angle && angle <= postureInfo.endAngle) ||
+                // if point is in the range of the angle
+                if ((postureInfo.startAngle < postureInfo.endAngle && postureInfo.startAngle <= angle && angle <= postureInfo.endAngle) ||
                     (postureInfo.startAngle > postureInfo.endAngle && (postureInfo.startAngle <= angle || angle <= postureInfo.endAngle)))
                 {
                     ChangePosture(postureInfo.posture);
-                    SetInactivePostureInfos();
+                    InactivatePostureInfos();
                     return;
                 }
             }
         }
 
-        public void ChangePosture(Posture posture)
+        public override void ChangePosture(Posture posture)
         {
             SetPosture(posture);
 
@@ -89,7 +80,7 @@ namespace Room
             isPostureChanging = false;
         }
 
-        public void SelectPosture(Posture availablePosture = ~Posture.None)
+        public override void SelectPosture(Posture availablePosture = ~Posture.None)
         {
             isPostureChanging = true;
 
@@ -105,7 +96,7 @@ namespace Room
             }
         }
 
-        private void SetInactivePostureInfos()
+        private void InactivatePostureInfos()
         {
             foreach (var postureInfo in postureInfos)
             {
@@ -113,7 +104,7 @@ namespace Room
             }
         }
 
-        public void UndoPosture()
+        public override void UndoPosture()
         {
             ChangePosture(prevPosture);
             prevPosture = PostureCard.CurrentPosture;
@@ -123,7 +114,7 @@ namespace Room
         {
             mainCamera = Camera.main;
 
-            SetInactivePostureInfos();
+            InactivatePostureInfos();
         }
 
         public void OnEvent(EventData photonEvent)
@@ -145,17 +136,5 @@ namespace Room
             [Range(-180f, 180f)]
             public float endAngle;
         }
-    }
-
-    public interface IPostureController
-    {
-        public Posture CurrentPosture { get; }
-        public bool IsPostureChanging { get; }
-        /// <summary>
-        /// Change Posture and Send the posture to the opponent
-        /// </summary>
-        public void ChangePosture(Posture posture);
-        public void SelectPosture(Posture availablePosture = (Posture)(-1));
-        public void UndoPosture();
     }
 }
