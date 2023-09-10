@@ -44,12 +44,13 @@ namespace Card
             {
                 GameObject planCard = ObjectPool.GetObject("Card Pool");
                 planCard.GetComponent<PlanCard>().Initialize(CardData, PlayerController.Instance);
+                planCard.GetComponent<PlanCard>().CanMove = true;
                 strategyPlan.PlaceCard(planCard);
                 ObjectPool.ReturnObject("Hand Pool", gameObject);
             }
             else
             {
-                transform.position = OriginPosition;
+                transform.position = PrevPosition;
             }
         }
 

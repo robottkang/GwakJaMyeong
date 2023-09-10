@@ -11,7 +11,7 @@ namespace Card
         [SerializeField]
         private CardData cardData;
         protected Vector3 offset;
-        private Vector3 originPosition;
+        private Vector3 prevPosition;
         private Transform originParent;
 
         protected Image image;
@@ -26,7 +26,7 @@ namespace Card
                 else Debug.LogWarning("null is invaild for cardInfo");
             }
         }
-        protected Vector3 OriginPosition => originPosition;
+        protected Vector3 PrevPosition => prevPosition;
         protected Transform OriginParent => originParent;
 
         protected virtual void Awake()
@@ -45,7 +45,7 @@ namespace Card
             image.raycastTarget = false;
             transform.SetParent(GetComponentInParent<Canvas>().transform);
 
-            originPosition = transform.position;
+            prevPosition = transform.position;
             offset = transform.position - Input.mousePosition;
             offset.z = 0f;
         }
