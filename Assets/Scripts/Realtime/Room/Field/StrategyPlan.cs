@@ -7,40 +7,58 @@ namespace Room
 {
     public class StrategyPlan : MonoBehaviour
     {
-        [SerializeField]
-        private GameObject cardPrefab;
-        private GameObject placedCardObject;
+        private Stack<GameObject> placedCardObjects = new(2);
         [SerializeField, ReadOnly]
-        private CardInfo placedCardInfo;
+        private PlanCard firstPlacedPlanCard;
 
-        public GameObject PlacedCardObejct => placedCardObject;
-        public CardInfo PlacedCardInfo
+        public PlanCard PlacedPlanCardOnTop
         {
-            get => placedCardInfo;
-            set
+            get
             {
-                placedCardInfo = value;
-
-                if (placedCardInfo == null)
-                {
-                    ClearStrategyPlan();
-                    return;
-                }
-
-                placedCardObject = ObjectPool.GetObject("Card Pool", cardPrefab);
-                placedCardObject.GetComponent<IdeaCard>().CurrentStrategyPlan = this;
-                
-                placedCardObject.transform.SetPositionAndRotation(transform.position + Vector3.up * 0.08f, Quaternion.Euler(0f, 0f, 0f));
+                if (placedCardObjects.Count == 0) return null;
+                else return placedCardObjects.Peek().GetComponent<PlanCard>();
             }
         }
+        public PlanCard FirstPlacedPlanCard => firstPlacedPlanCard;
 
         public void ClearStrategyPlan()
         {
-            placedCardInfo = null;
+            firstPlacedPlanCard = null;
 
-            if (placedCardObject != null)
-                ObjectPool.ReturnObject("Card Pool", placedCardObject);
-            placedCardObject = null;
+            int count = placedCardObjects.Count;
+            for (int i = 0; i < count; i++)
+            {
+                ObjectPool.ReturnObject("Card Pool", placedCardObjects.Pop());
+            }
+        }
+
+        public void PlaceCard(GameObject obj)
+        {
+            if (obj == null) return;
+            
+            placedCardObjects.Push(obj);
+            obj.transform.SetParent(transform);
+            Vector3 position = transform.position +
+                (placedCardObjects.Count - 1) * Vector3.forward + 0.1f * placedCardObjects.Count * Vector3.up;
+            placedCardObjects.Peek().transform.position = position;
+            placedCardObjects.Peek().transform.localRotation = new Quaternion(0f, 0f, 180f, 0f);
+
+            PlanCard planCard;
+            (planCard = obj.GetComponent<PlanCard>()).CurrentStrategyPlan = this;
+            if (placedCardObjects.Count == 1)
+                firstPlacedPlanCard = planCard;
+        }
+
+        public void TradeCard(StrategyPlan target)
+        {
+            var targetCards = new Queue<GameObject>(target.placedCardObjects);
+            var thisCards = new Queue<GameObject>(this.placedCardObjects);
+            this.placedCardObjects.Clear();
+            target.placedCardObjects.Clear();
+            while (thisCards.Count > 0)
+                target.PlaceCard(thisCards.Dequeue());
+            while (targetCards.Count > 0)
+                this.PlaceCard(targetCards.Dequeue());
         }
     }
 }

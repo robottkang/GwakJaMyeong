@@ -89,5 +89,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c58d5e42daa4143a553d9c6b56d80b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardInfo: {fileID: 0}
-  targetParent: {fileID: 0}
+  cardData: {fileID: 0}
+  addedToInventory: 0

@@ -60,13 +60,4 @@ namespace Room
             }
         }
     }
-
-    public enum Phase
-    {
-        WaitPlayer,
-        Draw,
-        StrategyPlan,
-        Duel,
-        End,
-    }
 }

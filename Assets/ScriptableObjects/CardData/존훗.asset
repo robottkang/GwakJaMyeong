@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84324ec41d3c6b74295eca3af1a24787, type: 3}
+  m_Name: "\uC874\uD6D7"
+  m_EditorClassIdentifier: 
+  cardCode: 10
+  cardSprite: {fileID: 717793448, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
+  attack: 0
+  guardPoint: 0
+  damage: 0
+  requiredPosture: -1
+  finishingPosture: 0
+  cardText: "<sprite=0><sprite=3> \uD53C\uD574\uB97C 2 \uAC10\uC18C \uC2DC\uD0A8\uB2E4.
+    /<br>\uC790\uC138\uB97C \uD3FC\uD0C1\uC73C\uB85C \uBCC0\uD658\uD55C\uB2E4. \uC790\uC2E0\uC758
+    \uB2E4\uC74C \uAD6C\uC0C1\uCE74\uB4DC\uB294 \uBB34\uD6A8\uD654\uB418\uC9C0 \uC54A\uC73C\uBA70
+    \uD53C\uD574\uAC00 1 \uC99D\uAC00\uD55C\uB2E4."

@@ -8,7 +8,7 @@ namespace Card
 {
     public class RoomCard : DragalbeCard
     {
-        bool canMove = true;
+        private bool canMove = false;
 
         protected override void Awake()
         {
@@ -37,18 +37,20 @@ namespace Card
 
             base.OnEndDrag(eventData);
 
-            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Physics.Raycast(mouseRay, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Idea Field"));
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field"));
 
             StrategyPlan strategyPlan;
-            if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedCardInfo == null)
+            if (hitInfo.collider != null && (strategyPlan = hitInfo.collider.GetComponentInParent<StrategyPlan>()).PlacedPlanCardOnTop == null)
             {
-                strategyPlan.PlacedCardInfo = CardInfo;
+                GameObject planCard = ObjectPool.GetObject("Card Pool");
+                planCard.GetComponent<PlanCard>().Initialize(CardData, PlayerController.Instance);
+                planCard.GetComponent<PlanCard>().CanMove = true;
+                strategyPlan.PlaceCard(planCard);
                 ObjectPool.ReturnObject("Hand Pool", gameObject);
             }
             else
             {
-                transform.position = OriginPosition;
+                transform.position = PrevPosition;
             }
         }
 

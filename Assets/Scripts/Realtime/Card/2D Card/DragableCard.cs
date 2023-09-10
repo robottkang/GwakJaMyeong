@@ -9,25 +9,25 @@ namespace Card
     public class DragalbeCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField]
-        private CardInfo cardInfo;
+        private CardData cardData;
         protected Vector3 offset;
-        private Vector3 originPosition;
-        [HideInInspector]
-        public Transform targetParent;
+        private Vector3 prevPosition;
+        private Transform originParent;
 
         protected Image image;
 
-        public CardInfo CardInfo
+        public CardData CardData
         {
-            get => cardInfo;
+            get => cardData;
             set
             {
-                cardInfo = value;
-                if (value != null) image.sprite = cardInfo.CardSprite;
+                cardData = value;
+                if (value != null) image.sprite = cardData.CardSprite;
                 else Debug.LogWarning("null is invaild for cardInfo");
             }
         }
-        protected Vector3 OriginPosition => originPosition;
+        protected Vector3 PrevPosition => prevPosition;
+        protected Transform OriginParent => originParent;
 
         protected virtual void Awake()
         {
@@ -36,16 +36,16 @@ namespace Card
 
         protected virtual void Start()
         {
-            targetParent = transform.parent;
-            image.sprite = cardInfo.CardSprite;
+            originParent = transform.parent;
+            image.sprite = cardData.CardSprite;
         }
 
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             image.raycastTarget = false;
-            transform.SetParent(transform.GetComponentInParent<Canvas>().transform);
+            transform.SetParent(GetComponentInParent<Canvas>().transform);
 
-            originPosition = transform.position;
+            prevPosition = transform.position;
             offset = transform.position - Input.mousePosition;
             offset.z = 0f;
         }
@@ -57,7 +57,6 @@ namespace Card
 
         public virtual void OnEndDrag(PointerEventData eventData)
         {
-            transform.SetParent(targetParent);
             image.raycastTarget = true;
         }
     }

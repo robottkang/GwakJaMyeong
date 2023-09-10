@@ -2,36 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using DeckBuilding;
 
 namespace Card
 {
     public class DeckBuildingCard : DragalbeCard
     {
-        private Transform originParent;
-
-        protected override void Start()
-        {
-            originParent = transform.parent;
-            base.Start();
-        }
-
-        public override void OnBeginDrag(PointerEventData eventData)
-        {
-            base.OnBeginDrag(eventData);
-        }
-
-        public override void OnDrag(PointerEventData eventData)
-        {
-            base.OnDrag(eventData);
-        }
+        public bool addedToInventory = false;
 
         public override void OnEndDrag(PointerEventData eventData)
         {
             base.OnEndDrag(eventData);
 
-            if (targetParent.Equals(originParent))
-                transform.position = originParent.transform.position;
-            targetParent = originParent;
+            if (!addedToInventory)
+            {
+                Inventory.RemoveFromInventory(gameObject);
+                transform.position = OriginParent.position;
+                transform.SetParent(OriginParent);
+                transform.GetComponent<RectTransform>().sizeDelta = transform.parent.GetComponent<RectTransform>().sizeDelta;
+            }
+            addedToInventory = false;
         }
     }
 }

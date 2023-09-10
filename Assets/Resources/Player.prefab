@@ -68,5 +68,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21a6cfccb9c222e40a3c6e96d097de71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isReadyToPlay: 0
-  isMyAttackTurn: 0
+  readyToPlay: 0

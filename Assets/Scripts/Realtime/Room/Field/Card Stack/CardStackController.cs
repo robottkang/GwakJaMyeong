@@ -6,6 +6,10 @@ namespace Room
 {
     public class CardStackController : MonoBehaviour
     {
+#if UNITY_EDITOR
+        [EasyButtons.Button] private void DrawTest(int count) => DrawCard(count);
+        [EasyButtons.Button] private void StackTest(int count) => StackCard(count);
+#endif
         [Header("- Reference")]
         public GameObject cardPrefab;
         
@@ -38,13 +42,14 @@ namespace Room
 
                 cardObject.SetActive(activatesCardOnGeneration);
                 cardObject.transform.SetParent(transform);
-                cardObject.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
+                cardObject.transform.position = cardPosition;
+                cardObject.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
             }
         }
 
         public void DrawCard(int count)
         {
-            while (count > 0)
+            while (count > 0 && lastCardIndex >= 0)
             {
                 cardObjects[lastCardIndex].SetActive(false);
 
@@ -55,7 +60,7 @@ namespace Room
 
         public void StackCard(int count)
         {
-            while (count > 0)
+            while (count > 0 && lastCardIndex < cardObjects.Count)
             {
                 lastCardIndex += 1;
                 count -= 1;

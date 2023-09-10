@@ -13,8 +13,6 @@ namespace DeckBuilding
     {
         [SerializeField]
         private TextMeshProUGUI loadingButtonText;
-        [SerializeField]
-        private Inventory inventory;
         private bool triesEnteringLobby;
 
         private void Awake()
@@ -24,21 +22,21 @@ namespace DeckBuilding
 
         public void JoinLobby()
         {
-            if (inventory.transform.childCount == 11)
+            if (Inventory.Content.Length == 11)
             {
                 triesEnteringLobby = true;
 
                 Room.DeckController.deckList.Clear();
 
-                for (int i = 0; i < inventory.transform.childCount; i++)
+                for (int i = 0; i < Inventory.Content.Length; i++)
                 {
-                    Room.DeckController.deckList.Add(inventory.transform.GetChild(i).GetComponent<DragalbeCard>().CardInfo);
+                    Room.DeckController.deckList.Add(Inventory.Content[i].GetComponent<DragalbeCard>().CardData);
                 }
 #if UNITY_EDITOR
                 string debugCardList = "Card list: ";
                 foreach (var card in Room.DeckController.deckList)
                 {
-                    debugCardList += '\n' + card.CardName;
+                    debugCardList += '\n' + card.ThisCardCode.ToString();
                 }
                 Debug.Log(debugCardList);
 #endif
