@@ -19,3 +19,5 @@ MonoBehaviour:
   damage: 1
   requiredPosture: 6
   finishingPosture: 6
+  cardText: "\uC774 \uCE74\uB4DC\uB294 \uBB34\uD6A8\uD654\uB418\uC5C8\uC744 \uB54C
+    \uBB34\uD6A8\uD654\uB418\uB294 \uB300\uC2E0 \uD53C\uD574\uAC00 2 \uC99D\uAC00\uD55C\uB2E4."

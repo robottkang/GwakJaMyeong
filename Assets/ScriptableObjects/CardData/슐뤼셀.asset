@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: "\uC290\uB93C\uC140"
   m_EditorClassIdentifier: 
   cardCode: 7
-  cardSprite: {fileID: -217678080, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
+  cardSprite: {fileID: 1354630272, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   attack: 0
   guardPoint: 0
   damage: 0
   requiredPosture: -1
   finishingPosture: 0
+  cardText: "\uD50C\uB8E8\uD06C\uB85C \uBCC0\uD658\uD55C\uB2E4. \uC774\uBC88 \uD569
+    \uB3D9\uC548 \uD53C\uD574\uB97C \uBC1B\uC744 \uC2DC \uC0C1\uB300\uC5D0\uAC8C
+    1\uC758 \uD53C\uD574\uB97C \uC900\uB2E4. \uB2E4\uC74C \uAD6C\uC0C1 \uCE74\uB4DC\uC758
+    <sprite=2>)\uD53C\uD574\uAC00 2 \uC99D\uAC00\uD55C\uB2E4. / -"

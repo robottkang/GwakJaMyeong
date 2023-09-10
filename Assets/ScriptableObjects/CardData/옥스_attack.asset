@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: "\uC625\uC2A4_attack"
   m_EditorClassIdentifier: 
   cardCode: 14
-  cardSprite: {fileID: -924019559, guid: b735e712bc2d3eb4b9f31eae6d2be659, type: 3}
+  cardSprite: {fileID: 1361101340, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   attack: 0
   guardPoint: 0
   damage: 2
   requiredPosture: -1
   finishingPosture: 0
+  cardText: 

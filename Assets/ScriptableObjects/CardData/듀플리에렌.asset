@@ -19,3 +19,6 @@ MonoBehaviour:
   damage: 0
   requiredPosture: -1
   finishingPosture: 0
+  cardText: "\uC0C1\uB300\uB294 \uAD6C\uC0C1\uCE74\uB4DC\uB97C \uAEBE\uC744 \uC218
+    \uC5C6\uB2E4. \uC790\uC2E0\uC758 \uC774\uC804 \uAD6C\uC0C1\uCE74\uB4DC\uB97C
+    \uBCF5\uC0AC\uD558\uACE0 \uACF5\uAC1C\uD55C\uB2E4. /-"

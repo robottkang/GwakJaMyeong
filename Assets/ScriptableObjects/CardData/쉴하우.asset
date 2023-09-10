@@ -19,3 +19,4 @@ MonoBehaviour:
   damage: 2
   requiredPosture: 1
   finishingPosture: 6
+  cardText: 
