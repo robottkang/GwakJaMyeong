@@ -53,13 +53,15 @@ SpriteAtlas:
   - {fileID: -1941489708, guid: b735e712bc2d3eb4b9f31eae6d2be659, type: 3}
   - {fileID: -109491559, guid: b735e712bc2d3eb4b9f31eae6d2be659, type: 3}
   - {fileID: -924019559, guid: b735e712bc2d3eb4b9f31eae6d2be659, type: 3}
+  - {fileID: 21300000, guid: 4e45f754c7961604dafa16a32ea25524, type: 3}
   - {fileID: 2141518011, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   - {fileID: 367829299, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   - {fileID: 218986069, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   - {fileID: -1212573128, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   - {fileID: 1923786314, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
-  - {fileID: -217678080, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
+  - {fileID: 1354630272, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   - {fileID: 717793448, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
+  - {fileID: 1361101340, guid: 90abc8d4955240e489fed83b3aff3bac, type: 3}
   - {fileID: 1004122004, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
   - {fileID: 100111307, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
   - {fileID: -317222441, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
@@ -67,10 +69,12 @@ SpriteAtlas:
   - {fileID: -1129671814, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
   - {fileID: -2143247162, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
   - {fileID: 2066380044, guid: 728be3ecfffd92e4bb27a36170499fab, type: 3}
+  - {fileID: 21300000, guid: 0099a05d9ff2b154d818c84ae201da5f, type: 3}
   m_PackedSpriteNamesToIndex:
   - Background
   - Sword
   - "\uC625\uC2A4_attack"
+  - Background
   - "\uD589\uC5D4"
   - "\uB4C0\uD50C\uB9AC\uC5D0\uB80C"
   - "\uB450\uD788\uBCA1\uC140"
@@ -78,6 +82,7 @@ SpriteAtlas:
   - "\uBDD8\uB4E0"
   - "\uC290\uB93C\uC140"
   - "\uC874\uD6D7"
+  - "\uACF5\uACA9_\uC625\uC2A4"
   - "\uC988\uBC84\uD06C\uD558\uC6B0"
   - "\uC544\uC6B0\uD504\uC288\uD2B8\uB77C\uC774\uCCB8"
   - "\uB791\uC624\uD2B8"
@@ -85,6 +90,7 @@ SpriteAtlas:
   - "\uC274\uD558\uC6B0"
   - "\uC0E4\uC774\uD154\uD558\uC6B0"
   - "\uC874\uD558\uC6B0"
+  - AttackSprite
   m_RenderDataMap: {}
   m_Tag: Card Atlas
   m_IsVariant: 0
