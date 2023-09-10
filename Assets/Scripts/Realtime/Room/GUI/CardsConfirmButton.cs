@@ -52,15 +52,17 @@ namespace Room.UI
                 cardsData[i] = planCard.CardData;
             }
 
-            for (int i = 0; i < 3; i++)
+            foreach (var card in cardsData)
             {
+                Debug.Log($"Send card: {JsonUtility.ToJson(card)}");
+                
                 PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardsData,
-                    JsonUtility.ToJson(cardsData[i]),
+                    JsonUtility.ToJson(card),
                     RaiseEventOptions.Default,
                     SendOptions.SendReliable);
             }
 
-            Debug.Log("Send cards data");
+            PlayerController.Instance.IsReadyPlanCard = true;
             canvasGroup.DOFade(0f, 0.5f)
                 .OnComplete(() => gameObject.SetActive(false));
         }

@@ -5,6 +5,7 @@ using Card.Posture;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using Card;
 
 namespace Room.Opponent
 {
@@ -52,7 +53,17 @@ namespace Room.Opponent
         {
             if (photonEvent.Code == (byte)DuelEventCode.SendMyPosture)
             {
-                SetPosture((Posture)photonEvent.CustomData);
+                Posture posture = (Posture)photonEvent.CustomData;
+                SetPosture(posture);
+
+                if (PhaseManager.CurrentPhase != Phase.Duel) return;
+                if (posture == Posture.Ochs && OpponentController.Instance.CurrentCard.CurrentCardDeployment == CardDeployment.Turned)
+                {
+                    GameObject ochsCard = ObjectPool.GetObject("Card Pool");
+                    ochsCard.GetComponent<PlanCard>().Initialize(ochs_attack, OpponentController.Instance);
+                    OpponentController.Instance.PlaceCard(ochsCard);
+                    ochsCard.GetComponent<PlanCard>().CurrentCardDeployment = CardDeployment.Turned;
+                }
             }
         }
     }

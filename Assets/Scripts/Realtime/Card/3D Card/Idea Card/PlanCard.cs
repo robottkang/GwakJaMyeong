@@ -18,7 +18,7 @@ namespace Card
         [SerializeField, ReadOnly]
         private CardData cardData;
         private CardDeployment currentCardDeployment;
-        public Action onCardOpen, onCardTurn, onCardSumStart, onCardSum;//, onCardSumEnd;
+        public Action onCardOpen, onCardTurn, onCardSumStart, onCardSum, onCardSumEnd;
         [SerializeField, ReadOnly]
         private StrategyPlan currentStrategyPlan;
         private Vector3 originPosition;
@@ -26,7 +26,6 @@ namespace Card
         public bool CanMove { get; set; } = false;
         public int DamageBuff { get; set; }
         public int DamageDebuff { get; set; }
-        public int Defense { get; set; }
         public bool IsNotInvaild { get; set; }
         public bool Invaildated { get; set; }
         public FieldController MyFieldController { get; private set; }
@@ -42,16 +41,17 @@ namespace Card
                         transform.SetPositionAndRotation(originPosition, Quaternion.Euler(0f, 0f, 0f));
                         break;
                     case CardDeployment.Opened:
-                        transform.DOLocalMove(0.5f * Vector3.forward, 0.5f);
-                        transform.DOLocalRotate(new Vector3(0f, 0f, 180f), 0.5f);
+                        transform.DOLocalMoveZ(0.5f, 0.5f);
+                        transform.DOLocalRotate(new Vector3(0f, 0f, 0f), 0.5f);
                         break;
                     case CardDeployment.Turned:
-                        transform.DOLocalMove(0.5f * Vector3.forward, 0.5f);
-                        transform.DOLocalRotate(new Vector3(0f, 90f, 0f), 0.5f);
+                        transform.DOLocalMoveZ(0.5f, 0.5f);
+                        transform.DOLocalRotate(new Vector3(0f, 90f, 180f), 0.5f);
                         onCardTurn.Invoke();
                         break;
                     case CardDeployment.Disabled:
-                        transform.DOLocalMove(0.5f * Vector3.forward, 0.5f);
+                        transform.DOLocalMoveZ(0.5f, 0.5f);
+                        transform.DOLocalRotate(new Vector3(0f, 0f, 180f), 0.5f);
                         break;
                     default:
                         throw new NotImplementedException();
@@ -61,7 +61,11 @@ namespace Card
         public StrategyPlan CurrentStrategyPlan
         {
             get => currentStrategyPlan;
-            set => currentStrategyPlan = value;
+            set
+            {
+                currentStrategyPlan = value;
+                originPosition = transform.position;
+            }
         }
         public CardData CardData => cardData;
 
@@ -75,9 +79,9 @@ namespace Card
 
         public void Initialize(CardData cardData, FieldController myFieldController)
         {
+            this.cardData = cardData;
             DamageBuff = 0;
             DamageDebuff = 0;
-            Defense = 0;
             IsNotInvaild = false;
             Invaildated = false;
             currentCardDeployment = CardDeployment.Placed;
@@ -87,8 +91,8 @@ namespace Card
             onCardTurn = () => cardData.Turn(myFieldController, myFieldController.OpponentField);
             onCardSumStart = () => cardData.SumStart(myFieldController, myFieldController.OpponentField);
             onCardSum = () => cardData.Sum(myFieldController, myFieldController.OpponentField);
-            //onCardSumEnd = () => cardData.SumEnd(myFieldController, myFieldController.OpponentField);
-            cardSprite.sprite = cardData.CardSprite;
+            onCardSumEnd = () => cardData.SumEnd(myFieldController, myFieldController.OpponentField);
+            cardSprite.sprite = DuelManager.CardSprites[(int)cardData.ThisCardCode];
             cardSprite.color = Color.white;
         }
 

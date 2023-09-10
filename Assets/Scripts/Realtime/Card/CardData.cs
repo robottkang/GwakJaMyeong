@@ -44,6 +44,8 @@ namespace Card
         protected Posture.Posture requiredPosture = (Posture.Posture)(-1);
         [SerializeField]
         protected Posture.Posture finishingPosture;
+        [SerializeField, TextArea]
+        private string cardText;
 
         public CardCode ThisCardCode => cardCode;
         public Sprite CardSprite => cardSprite;
@@ -52,14 +54,15 @@ namespace Card
         public AttackType GuardPoint => guardPoint;
         public Posture.Posture RequiredPosture => requiredPosture;
         public Posture.Posture FinishingPosture => finishingPosture;
+        public string CardText => cardText;
 
         public void Open(FieldController me, FieldController target) => cardTypes[cardCode].Open(me, target);
         public void Turn(FieldController me, FieldController target) => cardTypes[cardCode].Turn(me, target);
         public void SumStart(FieldController me, FieldController target) => cardTypes[cardCode].SumStart(me, target);
         public void Sum(FieldController me, FieldController target) => cardTypes[cardCode].Sum(me, target);
-        //public void SumEnd(FieldController me, FieldController target) => cardTypes[cardCode].SumEnd(me, target);
+        public void SumEnd(FieldController me, FieldController target) => cardTypes[cardCode].SumEnd(me, target);
 
-        [Flags]
+        [Flags, Serializable]
         public enum AttackType
         {
             None = 0,
@@ -81,7 +84,7 @@ namespace Card
             HorizontalCut = 8,
         }
 
-
+        [Serializable]
         public enum CardCode
         {
             Duhbacel,
@@ -108,6 +111,6 @@ namespace Card
         public void Turn(FieldController me, FieldController opponent);
         public void SumStart(FieldController me, FieldController opponent);
         public void Sum(FieldController me, FieldController opponent);
-        //public void SumEnd(FieldController me, FieldController opponent);
+        public void SumEnd(FieldController me, FieldController opponent);
     }
 }

@@ -33,7 +33,7 @@ namespace Card.Posture
         }
     }
 
-    [Flags]
+    [Flags, Serializable]
     public enum Posture
     {
         None = 0,

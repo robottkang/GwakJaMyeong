@@ -100,6 +100,7 @@ namespace Room
         #region LaunchPhase
         private async UniTask LaunchPhase(CancellationToken token)
         {
+
             if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
             await ChooseOpeningPosture(token);
             CurrentPhase = Phase.StrategyPlan;
@@ -142,7 +143,7 @@ namespace Room
         private async UniTask DuelPhase(CancellationToken token)
         {
             DuelManager.StartDuel();
-            await UniTask.WaitUntil(() => true, cancellationToken: token);
+            await UniTask.WaitUntil(() => !DuelManager.IsInDuel, cancellationToken: token);
             CurrentPhase = Phase.End;
         }
         #endregion

@@ -12,15 +12,21 @@ namespace Room
 {
     public class DuelManager : MonoBehaviour, IOnEventCallback
     {
+        [SerializeField]
+        private List<Sprite> cardSprites = new();
         private static bool receivesCardDepolyment;
         public static bool IsInDuel { get; private set; } = false;
         public static int StrategyPlanOrder { get; private set; } = 0;
         public static bool HasActionToken { get; private set; } = false;
+        public static Sprite[] CardSprites { get; private set; }
 
         private static System.Threading.CancellationTokenSource ctsOnDestory = new();
 
         private void Awake()
         {
+            CardSprites = cardSprites.ToArray();
+            ctsOnDestory = new();
+
             PhotonNetwork.AddCallbackTarget(this);
         }
 
@@ -75,30 +81,31 @@ namespace Room
                 
                 if (HasActionToken) await CalcaulateCard(PlayerController.Instance.CurrentCard, Opponent.OpponentController.Instance.CurrentCard);
                 else await CalcaulateCard(Opponent.OpponentController.Instance.CurrentCard, PlayerController.Instance.CurrentCard);
-                SwapActionToken();
+
+                StrategyPlanOrder++;
             }
+            SwapActionToken();
             IsInDuel = false;
         }, ctsOnDestory.Token);
 
         private async static UniTask CalcaulateCard(PlanCard attacker, PlanCard defender)
         {
-            UniTask waitChangingAnyPosture = UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
             
             Debug.Log("Start Card Calc");
-            attacker.onCardOpen.Invoke();
-            await waitChangingAnyPosture;
-            defender.onCardOpen.Invoke();
-            await waitChangingAnyPosture;
-            attacker.onCardSumStart.Invoke();
-            await waitChangingAnyPosture;
-            defender.onCardSumStart.Invoke();
-            await waitChangingAnyPosture;
-            attacker.onCardSum.Invoke();
-            await waitChangingAnyPosture;
-            defender.onCardSum.Invoke();
-            await waitChangingAnyPosture;
-
-            StrategyPlanOrder++;
+            attacker.onCardOpen?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            defender.onCardOpen?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            attacker.onCardSumStart?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            defender.onCardSumStart?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            attacker.onCardSum?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            defender.onCardSumEnd?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            defender.onCardSumEnd?.Invoke();
+            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
         }
 
         public static void EndGame(FieldController loser)

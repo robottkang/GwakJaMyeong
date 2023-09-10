@@ -4,6 +4,9 @@ using UnityEngine;
 using Card;
 using Card.Posture;
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace Room
 {
@@ -16,11 +19,12 @@ namespace Room
         private GameObject turning;
         [SerializeField]
         private GameObject disabling;
-        [SerializeField]
-        private float cancelDistance = 1f;
         private bool isSelecting = false;
+        private bool selectsDeployment = false;
         private StrategyPlan CurrentStrategyPlan => PlayerController.Instance.StrategyPlans[DuelManager.StrategyPlanOrder];
         public bool IsSelecting => isSelecting;
+        public bool CanOpen => opening.activeSelf;
+        public bool CanTurn => turning.activeSelf;
 
         private void Awake()
         {
@@ -29,20 +33,19 @@ namespace Room
 
         private void Update()
         {
-            if (isSelecting && Input.GetMouseButtonUp(0))
+            if (isSelecting && !selectsDeployment && Input.GetMouseButtonUp(0))
             {
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo);
-                if (Vector3.Distance(hitInfo.transform.position, transform.position) < cancelDistance) return;
 
                 bool isDisabled = CurrentStrategyPlan.FirstPlacedPlanCard.onCardOpen == null;
-                CardDeployment deployment = (hitInfo.transform.position.z - transform.position.z) switch
+                CardDeployment deployment = (hitInfo.point.z - transform.position.z) switch
                 {
-                    >= 0f when !isDisabled => CardDeployment.Opened,
-                    < 0f  when !isDisabled => CardDeployment.Turned,
-                    _     when  isDisabled => CardDeployment.Disabled,
-                    _ => throw new System.NotImplementedException(),
+                    >= 0f when !isDisabled && CanOpen => CardDeployment.Opened,
+                    < 0f  when !isDisabled && CanTurn => CardDeployment.Turned,
+                    _ => CardDeployment.Disabled,
                 };
                 ChangeDeployment(CurrentStrategyPlan.FirstPlacedPlanCard, deployment);
+                selectsDeployment = true;
 
                 UniTask.Void(async () =>
                 {
@@ -62,6 +65,7 @@ namespace Room
         public void SelectDeployment(PlanCard planCard)
         {
             isSelecting = true;
+            selectsDeployment = false;
             transform.position = planCard.CurrentStrategyPlan.transform.position;
             ActivateOptions(planCard);
         }
@@ -69,12 +73,25 @@ namespace Room
         private void ChangeDeployment(PlanCard target, CardDeployment deployment)
         {
             target.CurrentCardDeployment = deployment;
+
+            PhotonNetwork.RaiseEvent(
+                (byte)DuelEventCode.SendCardDepolyment,
+                (int)deployment,
+                RaiseEventOptions.Default,
+                SendOptions.SendReliable);
         }
 
         private void ActivateOptions(PlanCard planCard)
         {
-            if (planCard.onCardOpen != null) opening.SetActive(true);
-            else disabling.SetActive(true);
+            if (planCard.CardData.RequiredPosture.HasFlag(PlayerController.Instance.PostureController.CurrentPosture))
+            {
+                if (planCard.onCardOpen != null) opening.SetActive(true);
+                else disabling.SetActive(true);
+            }
+            else
+            {
+                if (planCard.onCardTurn == null) disabling.SetActive(true);
+            }
 
             if (planCard.onCardTurn != null) turning.SetActive(true);
         }

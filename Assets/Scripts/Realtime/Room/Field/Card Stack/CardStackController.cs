@@ -42,7 +42,8 @@ namespace Room
 
                 cardObject.SetActive(activatesCardOnGeneration);
                 cardObject.transform.SetParent(transform);
-                cardObject.transform.SetPositionAndRotation(cardPosition, Quaternion.Euler(0f, 0f, 180f));
+                cardObject.transform.position = cardPosition;
+                cardObject.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
             }
         }
 

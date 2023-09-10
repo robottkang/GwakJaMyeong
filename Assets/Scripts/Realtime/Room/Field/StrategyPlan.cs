@@ -35,16 +35,18 @@ namespace Room
         public void PlaceCard(GameObject obj)
         {
             if (obj == null) return;
+            
+            placedCardObjects.Push(obj);
+            obj.transform.SetParent(transform);
+            Vector3 position = transform.position +
+                (placedCardObjects.Count - 1) * Vector3.forward + 0.1f * placedCardObjects.Count * Vector3.up;
+            placedCardObjects.Peek().transform.position = position;
+            placedCardObjects.Peek().transform.localRotation = new Quaternion(0f, 0f, 180f, 0f);
 
             PlanCard planCard;
             (planCard = obj.GetComponent<PlanCard>()).CurrentStrategyPlan = this;
-            if (placedCardObjects.Count == 0)
+            if (placedCardObjects.Count == 1)
                 firstPlacedPlanCard = planCard;
-            placedCardObjects.Push(obj);
-            
-            Vector3 position = transform.position +
-                (placedCardObjects.Count - 1) * Vector3.forward + 0.08f * placedCardObjects.Count * Vector3.up;
-            placedCardObjects.Peek().transform.SetPositionAndRotation(position, Quaternion.Euler(0f, 0f, 0f));
         }
 
         public void TradeCard(StrategyPlan target)

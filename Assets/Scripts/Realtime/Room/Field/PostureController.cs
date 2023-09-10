@@ -10,6 +10,8 @@ namespace Room
         [Header("- References")]
         [SerializeField]
         protected PostureCard postureCard;
+        [SerializeField]
+        protected Card.CardData ochs_attack;
         protected Posture prevPosture = Posture.None;
         [SerializeField, ReadOnly()]
         protected bool isPostureChanging = false;

@@ -39,6 +39,13 @@ namespace Room.Opponent
                 deck.DrawCard(3);
             });
 
+            PhaseEventBus.Subscribe(Phase.End, () =>
+            {
+                foreach (var strategyPlan in StrategyPlans)
+                {
+                    strategyPlan.ClearStrategyPlan();
+                }
+            });
             PhaseEventBus.Subscribe(Phase.End, () => dust.StackCard(3));
         }
 
@@ -88,10 +95,11 @@ namespace Room.Opponent
             {
                 Card.CardData cardData = ScriptableObject.CreateInstance<Card.CardData>();
                 JsonUtility.FromJsonOverwrite((string)photonEvent.CustomData, cardData);
-                Debug.Log($" Receive {cardData.ThisCardCode}");
+                Debug.Log($" Receive {(string)photonEvent.CustomData}");
 
                 GameObject planCardObj = ObjectPool.GetObject("Card Pool");
                 planCardObj.GetComponent<Card.PlanCard>().Initialize(cardData, this);
+                planCardObj.transform.rotation = Quaternion.Euler(0, 0, 180f);
                 planCardObj.GetComponent<Card.PlanCard>().CanMove = false;
                 StrategyPlans[planCardOrder].PlaceCard(planCardObj);
 
@@ -101,6 +109,11 @@ namespace Room.Opponent
                     IsReadyPlanCard = true;
                     planCardOrder = 0;
                 }
+            }
+
+            if (photonEvent.Code == (byte)DuelEventCode.SendCardDepolyment)
+            {
+                CurrentCard.CurrentCardDeployment = (Card.CardDeployment)photonEvent.CustomData;
             }
         }
     }

@@ -14,7 +14,7 @@ namespace Card.Types
         /// </summary>
         protected virtual void Invaildate(PlanCard targetCard)
         {
-            if (!targetCard.IsNotInvaild)
+            if (!targetCard.IsNotInvaild || targetCard.CurrentCardDeployment != CardDeployment.Disabled)
             {
                 targetCard.Invaildated = true;
                 if (targetCard.CurrentCardDeployment == CardDeployment.Turned)
@@ -28,25 +28,6 @@ namespace Card.Types
         /// targetField에게 대미지를 가합니다.<br/>
         /// 만약 대미지가 0보다 크다면, targetField의 현재 카드를 비활성화 시킵니다.
         /// </summary>
-        protected void Attack(int damage, FieldController targetField)
-        {
-            Attack(damage, targetField.CurrentCard, targetField);
-        }
-        protected void Attack(int damage, PlanCard opponentCard, FieldController targetField)
-        {
-            Attack(damage, opponentCard, targetField.OpponentField, targetField);
-        }
-        protected void Attack(int damage, PlanCard opponentCard, FieldController myField, FieldController targetField)
-        {
-            damage -= opponentCard.Defense;
-            if (damage > 0)
-            {
-                TakeDamage(damage, targetField);
-                Disable(opponentCard);
-            }
-            if (myField.CurrentCard.CardData.FinishingPosture != Posture.Posture.None)
-                myField.PostureController.SelectPosture(myField.CurrentCard.CardData.FinishingPosture);
-        }
         protected void Attack(PlanCard myCard, FieldController targetField)
         {
             Attack(myCard, targetField.CurrentCard, targetField);
@@ -57,6 +38,8 @@ namespace Card.Types
         }
         protected void Attack(PlanCard myCard, PlanCard opponentCard, FieldController myField, FieldController targetField)
         {
+            if (myCard.Invaildated) return;
+
             int damage = CalculateDamage(myCard, opponentCard);
             if (damage > 0)
             {
@@ -94,17 +77,16 @@ namespace Card.Types
             targetCard.onCardTurn = null;
             targetCard.onCardSumStart = null;
             targetCard.onCardSum = null;
+            targetCard.onCardSumEnd = null;
         }
 
         protected virtual int CalculateDamage(PlanCard myCard, PlanCard opponentCard)
         {
-            return myCard.CardData.Damage + myCard.DamageBuff - myCard.DamageDebuff - opponentCard.Defense;
+            bool isOpponentPflug = opponentCard.MyFieldController.PostureController.CurrentPosture == Posture.Posture.Pflug;
+            return myCard.CardData.Damage + myCard.DamageBuff - myCard.DamageDebuff - (isOpponentPflug ? 1 : 0);
         }
 
-        public virtual void Open(FieldController me, FieldController opponent)
-        {
-
-        }
+        public virtual void Open(FieldController me, FieldController opponent) { }
 
         public virtual void Turn(FieldController me, FieldController opponent)
         {
@@ -124,11 +106,7 @@ namespace Card.Types
 
         public abstract void Sum(FieldController me, FieldController opponent);
 
-        //public virtual void SumEnd(FieldController me, FieldController opponent)
-        //{
-        //    if (me.CurrentCard.CardData.FinishingPosture != Posture.Posture.None)
-        //        me.PostureController.SelectPosture(me.CurrentCard.CardData.FinishingPosture);
-        //}
+        public virtual void SumEnd(FieldController me, FieldController opponent) { }
     }
 
     /// <summary>
@@ -140,8 +118,6 @@ namespace Card.Types
 
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
             RegistInvaild(me.CurrentCard);
         }
 
@@ -163,19 +139,17 @@ namespace Card.Types
     }
 
     /// <summary>
-    /// 이전 카드 복사 (미구현)
+    /// 이전 카드 복사
     /// </summary>
     public class Dupliaren : CombatTechnique
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
             int order = DuelManager.StrategyPlanOrder;
             if (order == 0) return;
 
             var prevPlanCardObj = ObjectPool.GetObject("Card Pool");
-            prevPlanCardObj.GetComponent<PlanCard>().Initialize(me.GetCard(order - 1).CardData, me);
+            prevPlanCardObj.GetComponent<PlanCard>().Initialize(me.StrategyPlans[order - 1].FirstPlacedPlanCard.CardData, me);
             me.PlaceCard(prevPlanCardObj);
 
             prevPlanCardObj.GetComponent<PlanCard>().onCardOpen.Invoke();
@@ -188,8 +162,6 @@ namespace Card.Types
     {
         public override void Sum(FieldController me, FieldController opponent)
         {
-            //if (me.CurrentCard.Invaildated) return;
-
             Attack(me.CurrentCard, opponent);
         }
     }
@@ -202,22 +174,30 @@ namespace Card.Types
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
+            RegistInvaild(me.CurrentCard);
             opponent.CurrentCard.onCardTurn = null;
         }
 
         public override void Sum(FieldController me, FieldController opponent)
         {
             PlanCard myPlanCard = me.CurrentCard;
+
+            RegistInvaild(myPlanCard);
             Attack(myPlanCard, opponent);
 
-            if (myPlanCard.Invaildated)
+            if (myPlanCard.IsNotInvaild)
             {
                 me.PostureController.SelectPosture();
             }
-            myPlanCard.Invaildated = false;
-            myPlanCard.IsNotInvaild = true;
+        }
+
+        private void RegistInvaild(PlanCard myPlanCard)
+        {
+            if (myPlanCard.Invaildated)
+            {
+                myPlanCard.IsNotInvaild = true;
+                myPlanCard.Invaildated = false;
+            }
         }
     }
 
@@ -229,8 +209,6 @@ namespace Card.Types
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
             PlanCard opponentPlanCard = opponent.CurrentCard;
             if (opponentPlanCard.CurrentCardDeployment == CardDeployment.Turned ||
                 opponentPlanCard.CurrentCardDeployment == CardDeployment.Opened && opponentPlanCard.CardData.Damage == 0)
@@ -258,25 +236,22 @@ namespace Card.Types
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
-            EffectShaitelhau(opponent);
+            EffectShaitelhau(opponent.CurrentCard);
         }
 
         public override void Sum(FieldController me, FieldController opponent)
         {
-            EffectShaitelhau(opponent);
+            EffectShaitelhau(opponent.CurrentCard);
 
             Attack(me.CurrentCard, opponent);
         }
 
-        private void EffectShaitelhau(FieldController opponent)
+        private void EffectShaitelhau(PlanCard opponentCard)
         {
-            PlanCard opponentPlanCard = opponent.CurrentCard;
-            if (opponentPlanCard.CurrentCardDeployment == CardDeployment.Opened && 
-                opponentPlanCard.CardData.Attack.HasFlag(CardData.AttackType.UpwardCut))
+            if (opponentCard.CurrentCardDeployment == CardDeployment.Opened && 
+                opponentCard.CardData.Attack == CardData.AttackType.UpwardCut)
             {
-                Invaildate(opponentPlanCard);
+                Invaildate(opponentCard);
             }
         }
     }
@@ -296,14 +271,12 @@ namespace Card.Types
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
             me.PostureController.ChangePosture(Posture.Posture.Pflug);
 
             int order = DuelManager.StrategyPlanOrder;
             PlanCard nextPlanCard;
             if (order < 3 && (nextPlanCard = me.GetCard(order + 1))
-                .CardData.Attack.HasFlag(CardData.AttackType.Stab))
+                .CardData.Attack == CardData.AttackType.Stab)
             {
                 nextPlanCard.DamageBuff += 2;
             }
@@ -314,7 +287,7 @@ namespace Card.Types
                 int prevOrder = DuelManager.StrategyPlanOrder;
                 await UniTask.WaitUntil(() => me.Hp != prevHp || DuelManager.StrategyPlanOrder != prevOrder);
                 if (me.Hp < prevHp)
-                    Attack(1, opponent);
+                    TakeDamage(1, opponent);
             });
         }
 
@@ -328,10 +301,13 @@ namespace Card.Types
     {
         public override void Sum(FieldController me, FieldController opponent)
         {
-            if (!opponent.CurrentCard.Invaildated)
-                Disable(me.GetCard(DuelManager.StrategyPlanOrder + 1));
-
             Attack(me.CurrentCard, opponent);
+        }
+
+        public override void SumEnd(FieldController me, FieldController opponent)
+        {
+            if (opponent.CurrentCard.Invaildated)
+                Disable(me.GetCard(DuelManager.StrategyPlanOrder + 1));
         }
     }
 
@@ -359,11 +335,9 @@ namespace Card.Types
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
             PlanCard opponentPlanCard = opponent.CurrentCard;
-            if (opponentPlanCard.CardData.Attack.HasFlag(CardData.AttackType.UpwardCut) ||
-                opponentPlanCard.CardData.Attack.HasFlag(CardData.AttackType.DownwardCut))
+            if (opponentPlanCard.CardData.Attack == CardData.AttackType.UpwardCut ||
+                opponentPlanCard.CardData.Attack == CardData.AttackType.DownwardCut)
             {
                 opponentPlanCard.DamageDebuff -= 2;
             }
@@ -376,17 +350,34 @@ namespace Card.Types
             if (DuelManager.StrategyPlanOrder < 3)
             {
                 PlanCard nextPlanCard = me.GetCard(DuelManager.StrategyPlanOrder + 1);
-                nextPlanCard.Invaildated = false;
+                nextPlanCard.IsNotInvaild = true;
                 nextPlanCard.DamageBuff += 1;
             }
         }
     }
 
+    /// <summary>
+    /// 상대 공격카드가 폼탁으로 시작 시, 공격카드를 무효화.
+    /// </summary>
     public class Zverkhau : CombatTechnique
     {
+        public override void Open(FieldController me, FieldController opponent)
+        {
+            ZverkhauEffect(opponent);
+        }
+
         public override void Sum(FieldController me, FieldController opponent)
         {
+            ZverkhauEffect(opponent);
             Attack(me.CurrentCard, opponent);
+        }
+
+        private void ZverkhauEffect(FieldController opponentField)
+        {
+            if (opponentField.PostureController.CurrentPosture == Posture.Posture.VomTag)
+            {
+                Invaildate(opponentField.CurrentCard);
+            }
         }
     }
 
@@ -398,11 +389,10 @@ namespace Card.Types
     {
         public override void Open(FieldController me, FieldController opponent)
         {
-            base.Open(me, opponent);
-
             PlanCard opponentPlanCard = opponent.CurrentCard;
-            if (opponentPlanCard.CardData.Damage == 0) return;
-            if (opponentPlanCard.CardData.Damage + opponentPlanCard.DamageBuff < 2)
+
+            if (opponentPlanCard.CardData.Damage != 0 &&
+                opponentPlanCard.CardData.Damage + opponentPlanCard.DamageBuff - opponentPlanCard.DamageDebuff < 2)
             {
                 Invaildate(opponentPlanCard);
             }
@@ -428,6 +418,11 @@ namespace Card.Types
             if (opponent.CurrentCard.Invaildated)
             {
                 opponent.PostureController.ChangePosture(Posture.Posture.Alber);
+
+                if (me == PlayerController.Instance)
+                {
+                    DuelManager.SetActionToken(true);
+                }
             }
         }
     }
