@@ -1,32 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Pun;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SingletonMonoBehaviour<GameManager>
 {
-    public static GameManager Instance { get; private set; }
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(this);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    [SerializeField]
+    private bool enabledDebug = false;
+    public bool EnabledDebug => enabledDebug;
 
     private void Update()
     {
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Escape))
             EditorApplication.isPlaying = false;
-#endif
-#if UNITY_STANDALONE
+#else
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
 #endif

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Room
 {
@@ -22,6 +23,8 @@ namespace Room
 
         public GameObject[] CardObjects => cardObjects.ToArray();
         public int LastCardIndex => lastCardIndex;
+        public UnityEvent OnDrawCard { get; } = new();
+        public UnityEvent OnStackCard { get; } = new();
 
         private void Awake()
         {
@@ -55,6 +58,8 @@ namespace Room
 
                 lastCardIndex -= 1;
                 count -= 1;
+
+                OnDrawCard.Invoke();
             }
         }
 
@@ -66,6 +71,8 @@ namespace Room
                 count -= 1;
                 
                 cardObjects[lastCardIndex].SetActive(true);
+
+                OnStackCard.Invoke();
             }
         }
     }

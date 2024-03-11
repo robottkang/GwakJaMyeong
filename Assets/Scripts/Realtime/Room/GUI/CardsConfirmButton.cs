@@ -54,7 +54,7 @@ namespace Room.UI
 
             foreach (var card in cardsData)
             {
-                Debug.Log($"Send card: {JsonUtility.ToJson(card)}");
+                Debug.Log($"Send card: " + card.ThisCardCode.ToString());
                 
                 PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardsData,
                     JsonUtility.ToJson(card),

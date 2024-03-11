@@ -19,7 +19,16 @@ namespace Room
 
         private void Start()
         {
-            Debug.Log(PhotonNetwork.CurrentRoom.ToString());
+#if UNITY_EDITOR
+            if (PhotonNetwork.IsConnected)
+                Debug.Log(PhotonNetwork.CurrentRoom.ToString());
+            else if (GameManager.Instance.EnabledDebug)
+                Debug.Log("Debug mode");
+#endif
+            if (!GameManager.Instance.EnabledDebug && !PhotonNetwork.IsConnected)
+            {
+                SceneManager.LoadScene("Deck Building");
+            }
         }
 
         public void LeaveRoom()

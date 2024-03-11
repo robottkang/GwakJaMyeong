@@ -20,7 +20,7 @@ namespace Lobby
         public void CreateRoom()
         {
             if (createInput.text.Length == 0)
-            {;
+            {
                 Debug.Log("input room code to create");
                 return;
             }

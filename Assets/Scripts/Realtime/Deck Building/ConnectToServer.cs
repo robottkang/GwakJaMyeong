@@ -22,26 +22,31 @@ namespace DeckBuilding
 
         public void JoinLobby()
         {
+            if (!PhotonNetwork.IsConnected)
+            {
+                ConnectUsingSettings();
+                return;
+            }
+
             if (Inventory.Content.Length == 11)
             {
                 triesEnteringLobby = true;
 
-                Room.DeckController.deckList.Clear();
+                Room.DeckZoneController.deckList.Clear();
 
                 for (int i = 0; i < Inventory.Content.Length; i++)
                 {
-                    Room.DeckController.deckList.Add(Inventory.Content[i].GetComponent<DragalbeCard>().CardData);
+                    Room.DeckZoneController.deckList.Add(Inventory.Content[i].GetComponent<DragalbeCard>().CardData);
                 }
 #if UNITY_EDITOR
                 string debugCardList = "Card list: ";
-                foreach (var card in Room.DeckController.deckList)
+                foreach (var card in Room.DeckZoneController.deckList)
                 {
                     debugCardList += '\n' + card.ThisCardCode.ToString();
                 }
                 Debug.Log(debugCardList);
 #endif
-                if (PhotonNetwork.IsConnected) PhotonNetwork.JoinLobby();
-                else ConnectUsingSettings();
+                PhotonNetwork.JoinLobby();
             }
         }
 

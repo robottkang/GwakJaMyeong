@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Room;
 
 namespace Card.Posture
 {
     public class PostureCard : MonoBehaviour
     {
-        private Posture currentPosture = Posture.VomTag;
-        public Posture CurrentPosture
+        private PostureType currentPosture = PostureType.VomTag;
+        public PostureType CurrentPosture
         {
             get => currentPosture;
             set
@@ -20,21 +21,21 @@ namespace Card.Posture
             }
         }
 
-        private void RotatePosture(Posture posture)
+        private void RotatePosture(PostureType posture)
         {
             transform.DOLocalRotateQuaternion(posture switch
             {
-                Posture.VomTag => Quaternion.Euler(0, 0, 0),
-                Posture.Pflug => Quaternion.Euler(0, 45, 0),
-                Posture.Ochs => Quaternion.Euler(0, 90, 0),
-                Posture.Alber => Quaternion.Euler(0, 0, 180),
+                PostureType.VomTag => Quaternion.Euler(0, 0, 0),
+                PostureType.Pflug => Quaternion.Euler(0, 45, 0),
+                PostureType.Ochs => Quaternion.Euler(0, 90, 0),
+                PostureType.Alber => Quaternion.Euler(0, 0, 180),
                 _ => throw new InvalidOperationException(),
             }, 0.25f);
         }
     }
 
     [Flags, Serializable]
-    public enum Posture
+    public enum PostureType
     {
         None = 0,
         /// <summary>
@@ -53,5 +54,12 @@ namespace Card.Posture
         /// 뒤
         /// </summary>
         Alber = 8,
+    }
+
+    [Serializable]
+    public class PostureEventData
+    {
+        public UserType changer;
+        public PostureType posture;
     }
 }

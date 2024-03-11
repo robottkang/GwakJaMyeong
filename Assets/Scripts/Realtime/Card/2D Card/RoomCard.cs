@@ -8,6 +8,7 @@ namespace Card
 {
     public class RoomCard : DragalbeCard
     {
+        [ReadOnly, SerializeField]
         private bool canMove = false;
 
         protected override void Awake()

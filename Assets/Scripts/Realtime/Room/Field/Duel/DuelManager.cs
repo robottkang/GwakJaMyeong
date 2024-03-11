@@ -7,6 +7,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Cysharp.Threading.Tasks;
 using Card;
+using System;
 
 namespace Room
 {
@@ -14,11 +15,21 @@ namespace Room
     {
         [SerializeField]
         private List<Sprite> cardSprites = new();
-        private static bool receivesCardDepolyment;
+        private static bool receivesOpponentCardDepolyment;
+        private static UserType actionToken = UserType.Player;
+        public static UnityEvent<UserType> OnActionTokenChanged { get; } = new();
         public static bool IsInDuel { get; private set; } = false;
         public static int StrategyPlanOrder { get; private set; } = 0;
-        public static bool HasActionToken { get; private set; } = false;
         public static Sprite[] CardSprites { get; private set; }
+        public static UserType ActionToken
+        {
+            get => actionToken;
+            private set
+            {
+                OnActionTokenChanged.Invoke(value);
+                actionToken = value;
+            }
+        }
 
         private static System.Threading.CancellationTokenSource ctsOnDestory = new();
 
@@ -44,68 +55,67 @@ namespace Room
             PlayerController.Instance.IsReadyPlanCard = false;
         }
 
-        public static void SetActionToken(bool myActionToken)
+        public static void SetPlayerActionToken(UserType actionToken)
         {
             // opponent
             PhotonNetwork.RaiseEvent((byte)DuelEventCode.SetActionToken,
-                !myActionToken,
+                actionToken ^ UserType.Opponent,
                 new RaiseEventOptions { Receivers = ReceiverGroup.Others },
                 SendOptions.SendReliable);
             // me
-            HasActionToken = myActionToken;
+            ActionToken = actionToken;
         }
 
         public static void SwapActionToken()
         {
             // opponent
             PhotonNetwork.RaiseEvent((byte)DuelEventCode.SetActionToken, 
-                HasActionToken, 
+                ActionToken, 
                 new RaiseEventOptions { Receivers = ReceiverGroup.Others }, 
                 SendOptions.SendReliable);
             // me
-            HasActionToken = !HasActionToken;
+            ActionToken ^= UserType.Opponent;
         }
 
-        public static void StartDuel() => UniTask.Void(async (token) =>
+        public static async UniTask StartDuel()
         {
             IsInDuel = true;
             for (int i = 0; i < 3; i++)
             {
-                receivesCardDepolyment = false;
+                receivesOpponentCardDepolyment = false;
 
-                await UniTask.WaitUntil(() => HasActionToken, cancellationToken: token);
+                await UniTask.WaitUntil(() => ActionToken == UserType.Player, cancellationToken: ctsOnDestory.Token);
 
                 PlayerController.Instance.PlanCardController.SelectDeployment(PlayerController.Instance.CurrentCard);
                 await UniTask.WaitUntil(() => !PlayerController.Instance.PlanCardController.IsSelecting
-                && receivesCardDepolyment && !FieldController.IsChangingAnyPosture, cancellationToken: token);
+                && receivesOpponentCardDepolyment && !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
                 
-                if (HasActionToken) await CalcaulateCard(PlayerController.Instance.CurrentCard, Opponent.OpponentController.Instance.CurrentCard);
-                else await CalcaulateCard(Opponent.OpponentController.Instance.CurrentCard, PlayerController.Instance.CurrentCard);
+                if (ActionToken == UserType.Player)
+                    await CalcaulateCard(PlayerController.Instance.CurrentCard, Opponent.OpponentController.Instance.CurrentCard);
+                else
+                    await CalcaulateCard(Opponent.OpponentController.Instance.CurrentCard, PlayerController.Instance.CurrentCard);
 
                 StrategyPlanOrder++;
             }
             SwapActionToken();
             IsInDuel = false;
-        }, ctsOnDestory.Token);
+        }
 
         private async static UniTask CalcaulateCard(PlanCard attacker, PlanCard defender)
         {
-            
             Debug.Log("Start Card Calc");
-            attacker.onCardOpen?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
-            defender.onCardOpen?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
-            attacker.onCardSumStart?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
-            defender.onCardSumStart?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
-            attacker.onCardSum?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
-            defender.onCardSumEnd?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
-            defender.onCardSumEnd?.Invoke();
-            await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+
+            List<Action> cardActionOrderList = new()
+            {
+                attacker.onCardOpen, defender.onCardOpen,
+                attacker.onCardSumStart, defender.onCardSumStart,
+                attacker.onCardSum, defender.onCardSumEnd
+            };
+            foreach (var cardAction in cardActionOrderList)
+            {
+                cardAction?.Invoke();
+                await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture, cancellationToken: ctsOnDestory.Token);
+            }
         }
 
         public static void EndGame(FieldController loser)
@@ -113,10 +123,12 @@ namespace Room
             if (loser is PlayerController)
             {
                 // Display lose
+                Debug.Log("You Lose");
             }
             else
             {
                 // Display win
+                Debug.Log("You Win");
             }
         }
 
@@ -124,13 +136,19 @@ namespace Room
         {
             if (photonEvent.Code == (byte)DuelEventCode.SetActionToken)
             {
-                HasActionToken = (bool)photonEvent.CustomData;
+                ActionToken = (UserType)photonEvent.CustomData;
             }
-            if (photonEvent.Code == (byte)DuelEventCode.SendCardDepolyment)
+            if (photonEvent.Code == (byte)DuelEventCode.SetCardDepolyment)
             {
-                receivesCardDepolyment = true;
+                receivesOpponentCardDepolyment = true;
             }
         }
+    }
+
+    public enum UserType
+    {
+        Player,
+        Opponent
     }
 
     public enum DuelEventCode
@@ -138,9 +156,8 @@ namespace Room
         Ready,
         SetActionToken,
         SendCardsData,
-        SendMyPosture,
-        SendOpponentPosture,
-        SendCardDepolyment,
+        SendPosture,
+        SetCardDepolyment,
         TakeDamage,
     }
 }

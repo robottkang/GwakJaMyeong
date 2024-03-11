@@ -10,6 +10,7 @@ namespace DeckBuilding
     {
         private static List<GameObject> content = new();
         public static GameObject[] Content => content.ToArray();
+        [SerializeField] private int maxCardCount = 11;
 
         private void Awake()
         {
@@ -18,12 +19,12 @@ namespace DeckBuilding
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (transform.childCount >= 11) return;
+            if (transform.childCount >= maxCardCount) return;
 
-            AddToInventory(eventData.pointerDrag);
+            AddCard(eventData.pointerDrag);
         }
 
-        private void AddToInventory(GameObject card)
+        private void AddCard(GameObject card)
         {
             card.transform.SetParent(transform);
             card.GetComponent<DeckBuildingCard>().addedToInventory = true;
@@ -32,7 +33,7 @@ namespace DeckBuilding
             SortChildren();
         }
 
-        public static void RemoveFromInventory(GameObject card)
+        public static void RemoveCard(GameObject card)
         {
             content.Remove(card);
             SortChildren();

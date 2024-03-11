@@ -10,7 +10,6 @@ namespace Card
     [Serializable]
     public class PlanCard : MonoBehaviour
     {
-        private Camera mainCamera;
         [SerializeField]
         private SpriteRenderer cardSprite;
         [SerializeField]
@@ -28,7 +27,7 @@ namespace Card
         public int DamageDebuff { get; set; }
         public bool IsNotInvaild { get; set; }
         public bool Invaildated { get; set; }
-        public FieldController MyFieldController { get; private set; }
+        public FieldController PlayerFieldCtrl { get; private set; }
         public CardDeployment CurrentCardDeployment
         {
             get => currentCardDeployment;
@@ -71,13 +70,11 @@ namespace Card
 
         private void Awake()
         {
-            mainCamera = Camera.main;
-
             PhaseEventBus.Subscribe(Phase.StrategyPlan, () => CanMove = true);
             PhaseEventBus.Subscribe(Phase.Duel, () => CanMove = false);
         }
 
-        public void Initialize(CardData cardData, FieldController myFieldController)
+        public void Initialize(CardData cardData, FieldController playerFieldCtrl)
         {
             this.cardData = cardData;
             DamageBuff = 0;
@@ -86,12 +83,12 @@ namespace Card
             Invaildated = false;
             currentCardDeployment = CardDeployment.Placed;
             CurrentStrategyPlan = null;
-            MyFieldController = myFieldController;
-            onCardOpen = () => cardData.Open(myFieldController, myFieldController.OpponentField);
-            onCardTurn = () => cardData.Turn(myFieldController, myFieldController.OpponentField);
-            onCardSumStart = () => cardData.SumStart(myFieldController, myFieldController.OpponentField);
-            onCardSum = () => cardData.Sum(myFieldController, myFieldController.OpponentField);
-            onCardSumEnd = () => cardData.SumEnd(myFieldController, myFieldController.OpponentField);
+            PlayerFieldCtrl = playerFieldCtrl;
+            onCardOpen = () => cardData.Open(playerFieldCtrl, playerFieldCtrl.OpponentField);
+            onCardTurn = () => cardData.Turn(playerFieldCtrl, playerFieldCtrl.OpponentField);
+            onCardSumStart = () => cardData.SumStart(playerFieldCtrl, playerFieldCtrl.OpponentField);
+            onCardSum = () => cardData.Sum(playerFieldCtrl, playerFieldCtrl.OpponentField);
+            onCardSumEnd = () => cardData.SumEnd(playerFieldCtrl, playerFieldCtrl.OpponentField);
             cardSprite.sprite = DuelManager.CardSprites[(int)cardData.ThisCardCode];
             cardSprite.color = Color.white;
         }
@@ -104,14 +101,14 @@ namespace Card
 
         private void Move()
         {
-            Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Board"));
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Board"));
             transform.position = hitInfo.point + Vector3.up;
         }
 
         private void Drop()
         {
             // if Card moves to StrategyPlan
-            if (Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field")) &&
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("Plan Field")) &&
                 hitInfo.transform.TryGetComponent(out StrategyPlan strategyPlan))
             {
                 cardSprite.color = new(1f, 1f, 1f, 0.5f);

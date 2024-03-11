@@ -12,17 +12,17 @@ namespace Room
         protected PostureCard postureCard;
         [SerializeField]
         protected Card.CardData ochs_attack;
-        protected Posture prevPosture = Posture.None;
+        protected PostureType prevPosture = PostureType.None;
         [SerializeField, ReadOnly()]
         protected bool isPostureChanging = false;
 
         public PostureCard PostureCard => postureCard;
-        public Posture CurrentPosture => postureCard.CurrentPosture;
+        public PostureType CurrentPosture => postureCard.CurrentPosture;
         public bool IsPostureChanging => isPostureChanging;
 
-        public abstract void ChangePosture(Posture posture);
+        public abstract void ChangePosture(PostureType posture);
 
-        public abstract void SelectPosture(Posture availablePosture = (Posture)(-1));
+        public abstract void SelectPosture(PostureType availablePosture = (PostureType)(-1));
 
         public abstract void UndoPosture();
     }

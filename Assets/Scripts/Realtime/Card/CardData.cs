@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Card.Types;
 using Room;
+using Card.Posture;
 
 namespace Card
 {
@@ -13,7 +14,7 @@ namespace Card
     {
         [SerializeField]
         protected CardCode cardCode;
-        private readonly Dictionary<CardCode, ICardEffect> cardTypes = new()
+        private readonly Dictionary<CardCode, ICardAction> cardTypes = new()
         {
             { CardCode.Aufschtraechen, new Aufschtraechen() },
             { CardCode.Boudun, new Boudun() },
@@ -41,9 +42,9 @@ namespace Card
         [SerializeField]
         protected int damage;
         [SerializeField]
-        protected Posture.Posture requiredPosture = (Posture.Posture)(-1);
+        protected PostureType requiredPosture = (PostureType)(-1);
         [SerializeField]
-        protected Posture.Posture finishingPosture;
+        protected PostureType finishingPosture;
         [SerializeField, TextArea]
         private string cardText;
 
@@ -52,8 +53,8 @@ namespace Card
         public int Damage => damage;
         public AttackType Attack => attack;
         public AttackType GuardPoint => guardPoint;
-        public Posture.Posture RequiredPosture => requiredPosture;
-        public Posture.Posture FinishingPosture => finishingPosture;
+        public PostureType RequiredPosture => requiredPosture;
+        public PostureType FinishingPosture => finishingPosture;
         public string CardText => cardText;
 
         public void Open(FieldController me, FieldController target) => cardTypes[cardCode].Open(me, target);
@@ -106,6 +107,25 @@ namespace Card
     }
 
     public interface ICardEffect
+    {
+        /// <summary>
+        /// targetCard가 무효화 불가가 아니라면, 그 카드를 무효화 시키고,<br/>
+        /// 카드이 꺾인 상태이라면 targetCard의 자세 변환을 취소시킨다.
+        /// </summary>
+        public void Invaildate(PlanCard targetCard);
+        /// <summary>
+        /// targetCard를 비활성화 시킨다.
+        /// </summary>
+        public void Disable(PlanCard targetCard);
+        public void Execute(PlanCard myCard, PlanCard opponentCard, FieldController myField, FieldController targetField);
+        public bool IsPostureVaild(PlanCard myCard);
+        /// <summary>
+        /// 상대 카드의 가드 포인트에 해당하는 유형의 카드와 합하고 있을 경우, targetCard를 무효화 시킵니다.
+        /// </summary>
+        public bool CheckGarudPoint(PlanCard opponentCard, PlanCard targetCard);
+    }
+
+    public interface ICardAction
     {
         public void Open(FieldController me, FieldController opponent);
         public void Turn(FieldController me, FieldController opponent);

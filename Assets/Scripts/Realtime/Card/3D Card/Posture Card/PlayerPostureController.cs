@@ -64,19 +64,23 @@ namespace Room
             }
         }
 
-        public override void ChangePosture(Posture posture)
+        public override void ChangePosture(PostureType posture)
         {
             SetPosture(posture);
 
             PhotonNetwork.RaiseEvent(
-                (byte)DuelEventCode.SendMyPosture,
-                postureCard.CurrentPosture,
+                (byte)DuelEventCode.SendPosture,
+                JsonUtility.ToJson(new PostureEventData()
+                {
+                    changer = UserType.Player,
+                    posture = postureCard.CurrentPosture
+                }),
                 RaiseEventOptions.Default,
                 SendOptions.SendReliable);
 
             if (PhaseManager.CurrentPhase != Phase.Duel) return;
 
-            if (posture == Posture.Ochs && PlayerController.Instance.CurrentCard.CurrentCardDeployment == CardDeployment.Turned)
+            if (posture == PostureType.Ochs && PlayerController.Instance.CurrentCard.CurrentCardDeployment == CardDeployment.Turned)
             {
                 GameObject ochsCard = ObjectPool.GetObject("Card Pool");
                 ochsCard.GetComponent<PlanCard>().Initialize(ochs_attack, PlayerController.Instance);
@@ -85,20 +89,20 @@ namespace Room
             }
         }
 
-        private void SetPosture(Posture posture)
+        private void SetPosture(PostureType posture)
         {
             prevPosture = PostureCard.CurrentPosture;
             postureCard.CurrentPosture = posture;
             isPostureChanging = false;
         }
 
-        public override void SelectPosture(Posture availablePosture = ~Posture.None)
+        public override void SelectPosture(PostureType availablePosture = ~PostureType.None)
         {
             isPostureChanging = true;
 
-            if (PostureCard.CurrentPosture == Posture.Pflug)
+            if (PostureCard.CurrentPosture == PostureType.Pflug)
             {
-                availablePosture &= ~Posture.Pflug;
+                availablePosture &= ~PostureType.Pflug;
             }
 
             foreach (var postureInfo in postureInfos)
@@ -131,16 +135,19 @@ namespace Room
 
         public void OnEvent(EventData photonEvent)
         {
-            if (photonEvent.Code == (byte)DuelEventCode.SendOpponentPosture)
+            if (photonEvent.Code == (byte)DuelEventCode.SendPosture)
             {
-                SetPosture((Posture)photonEvent.CustomData);
+                var data = JsonUtility.FromJson<PostureEventData>((string)photonEvent.CustomData);
+
+                if (data.changer == UserType.Opponent)
+                    SetPosture(data.posture);
             }
         }
 
         [System.Serializable]
         private struct PostureInfo
         {
-            public Posture posture;
+            public PostureType posture;
             public GameObject postureObject;
             [Tooltip("The foward direction is zero degrees")]
             [Range(-180f, 180f)]

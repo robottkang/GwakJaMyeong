@@ -75,7 +75,7 @@ namespace Room
             target.CurrentCardDeployment = deployment;
 
             PhotonNetwork.RaiseEvent(
-                (byte)DuelEventCode.SendCardDepolyment,
+                (byte)DuelEventCode.SetCardDepolyment,
                 (int)deployment,
                 RaiseEventOptions.Default,
                 SendOptions.SendReliable);
@@ -83,7 +83,7 @@ namespace Room
 
         private void ActivateOptions(PlanCard planCard)
         {
-            if (planCard.CardData.RequiredPosture.HasFlag(PlayerController.Instance.PostureController.CurrentPosture))
+            if (planCard.CardData.RequiredPosture.HasFlag(PlayerController.Instance.PostureCtrl.CurrentPosture))
             {
                 if (planCard.onCardOpen != null) opening.SetActive(true);
                 else disabling.SetActive(true);

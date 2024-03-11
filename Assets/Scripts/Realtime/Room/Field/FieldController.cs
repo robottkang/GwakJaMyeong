@@ -11,14 +11,14 @@ namespace Room
         [SerializeField]
         private StrategyPlan[] strategyPlans = new StrategyPlan[3];
         [SerializeField]
-        protected PostureController postureController;
+        protected PostureController postureCtrl;
         protected int hp = 10;
 
-        public static bool IsChangingAnyPosture => PlayerController.Instance.PostureController.IsPostureChanging
-            || Opponent.OpponentController.Instance.PostureController.IsPostureChanging;
+        public static bool IsChangingAnyPosture => PlayerController.Instance.PostureCtrl.IsPostureChanging
+            || Opponent.OpponentController.Instance.PostureCtrl.IsPostureChanging;
 
         public int Hp => hp;
-        public PostureController PostureController => postureController;
+        public PostureController PostureCtrl => postureCtrl;
         public StrategyPlan[] StrategyPlans => strategyPlans;
         public Card.PlanCard CurrentCard => strategyPlans[DuelManager.StrategyPlanOrder].PlacedPlanCardOnTop;
         public abstract FieldController OpponentField { get; }

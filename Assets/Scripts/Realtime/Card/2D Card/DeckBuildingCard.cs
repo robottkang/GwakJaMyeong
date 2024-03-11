@@ -10,18 +10,23 @@ namespace Card
     {
         public bool addedToInventory = false;
 
+        public override void OnBeginDrag(PointerEventData eventData)
+        {
+            base.OnBeginDrag(eventData);
+            addedToInventory = false;
+        }
+
         public override void OnEndDrag(PointerEventData eventData)
         {
             base.OnEndDrag(eventData);
 
             if (!addedToInventory)
             {
-                Inventory.RemoveFromInventory(gameObject);
+                Inventory.RemoveCard(gameObject);
                 transform.position = OriginParent.position;
                 transform.SetParent(OriginParent);
                 transform.GetComponent<RectTransform>().sizeDelta = transform.parent.GetComponent<RectTransform>().sizeDelta;
             }
-            addedToInventory = false;
         }
     }
 }

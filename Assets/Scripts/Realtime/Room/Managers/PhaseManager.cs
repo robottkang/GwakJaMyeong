@@ -15,9 +15,6 @@ namespace Room
 {
     public class PhaseManager : MonoBehaviour
     {
-#if UNITY_EDITOR
-        [EasyButtons.Button] private void ChangePhaseTest(int phase) => CurrentPhase = (Phase)phase;
-#endif
         private static UniTask phaseChangingTask = new();
         private CancellationTokenSource cts = new();
         private static UnityEvent onSecondCall = new();
@@ -33,7 +30,7 @@ namespace Room
                 currentPhase = value;
 
 #if UNITY_EDITOR
-                Debug.Log($"--- Current Page: {currentPhase} ---");
+                Debug.Log($"--- Current Phase: {currentPhase} ---");
 #endif
                 PhaseEventBus.Publish(currentPhase);
             }
@@ -100,7 +97,6 @@ namespace Room
         #region LaunchPhase
         private async UniTask LaunchPhase(CancellationToken token)
         {
-
             if (PhotonNetwork.IsMasterClient) ExecuteCoinToss();
             await ChooseOpeningPosture(token);
             CurrentPhase = Phase.StrategyPlan;
@@ -108,21 +104,21 @@ namespace Room
 
         public void ExecuteCoinToss()
         {
-            bool coin = UnityEngine.Random.Range(0, 2) > 0;
+            UserType coin = (UserType)UnityEngine.Random.Range(0, 2);
 
-            DuelManager.SetActionToken(coin);
-            Debug.Log("Coin Toss: " + (coin ? "mine" : "opponent"));
+            DuelManager.SetPlayerActionToken(coin);
+            Debug.Log("Coin Toss: " + (coin == UserType.Player ? "mine" : "opponent"));
         }
 
         public async UniTask ChooseOpeningPosture(CancellationToken token)
         {
-            OpponentController.Instance.PostureController.SelectPosture();
-            await UniTask.WaitUntil(() => DuelManager.HasActionToken, cancellationToken: token);
+            OpponentController.Instance.PostureCtrl.SelectPosture();
+            await UniTask.WaitUntil(() => DuelManager.ActionToken == UserType.Player, cancellationToken: token);
 
-            PlayerController.Instance.PostureController.SelectPosture();
-            await UniTask.WaitUntil(() => !PlayerController.Instance.PostureController.IsPostureChanging, cancellationToken: token);
+            PlayerController.Instance.PostureCtrl.SelectPosture();
+            await UniTask.WaitUntil(() => !PlayerController.Instance.PostureCtrl.IsPostureChanging, cancellationToken: token);
             DuelManager.SwapActionToken();
-            await UniTask.WaitUntil(() => !OpponentController.Instance.PostureController.IsPostureChanging, cancellationToken: token);
+            await UniTask.WaitUntil(() => !OpponentController.Instance.PostureCtrl.IsPostureChanging, cancellationToken: token);
         }
         #endregion
 
@@ -142,8 +138,7 @@ namespace Room
         #region DuelPhase
         private async UniTask DuelPhase(CancellationToken token)
         {
-            DuelManager.StartDuel();
-            await UniTask.WaitUntil(() => !DuelManager.IsInDuel, cancellationToken: token);
+            await DuelManager.StartDuel();
             CurrentPhase = Phase.End;
         }
         #endregion

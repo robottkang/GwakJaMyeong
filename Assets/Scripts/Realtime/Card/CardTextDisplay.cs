@@ -7,25 +7,13 @@ using UnityEngine.EventSystems;
 
 namespace Card.UI
 {
-    public class CardTextDisplayer : MonoBehaviour
+    public class CardTextDisplay : SingletonMonoBehaviour<CardTextDisplay>
     {
         [SerializeField]
         private Image cardSprite;
         [SerializeField]
         private TextMeshProUGUI cardText;
         private bool isDisplaying = false;
-
-        public CardTextDisplayer Instance { get; private set; }
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(this);
-            }
-            else Destroy(gameObject);
-        }
 
         private void Start()
         {

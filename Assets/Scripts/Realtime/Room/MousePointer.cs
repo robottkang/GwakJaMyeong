@@ -4,17 +4,9 @@ using UnityEngine;
 
 public class MousePointer : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject pointer;
-    
-    private void Start()
-    {
-        pointer = Instantiate(pointer);
-    }
-
     private void Update()
     {
         Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, Mathf.Infinity, LayerMask.GetMask("Board"));
-        pointer.transform.position = hit.point;
+        gameObject.transform.position = hit.point;
     }
 }

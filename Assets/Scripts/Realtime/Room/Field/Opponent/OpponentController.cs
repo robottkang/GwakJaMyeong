@@ -51,7 +51,8 @@ namespace Room.Opponent
 
         private void Start()
         {
-            if (PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
+            if (PhotonNetwork.IsConnected &&
+                PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
             {
                 deck.DrawCard(deck.cardCount);
             }
@@ -72,17 +73,11 @@ namespace Room.Opponent
             deck.DrawCard(deck.cardCount);
         }
 
-        public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
-        {
-        }
+        public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged) { }
 
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
-        {
-        }
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps) { }
 
-        public void OnMasterClientSwitched(Player newMasterClient)
-        {
-        }
+        public void OnMasterClientSwitched(Player newMasterClient) { }
 
         public void OnEvent(EventData photonEvent)
         {
@@ -111,7 +106,7 @@ namespace Room.Opponent
                 }
             }
 
-            if (photonEvent.Code == (byte)DuelEventCode.SendCardDepolyment)
+            if (photonEvent.Code == (byte)DuelEventCode.SetCardDepolyment)
             {
                 CurrentCard.CurrentCardDeployment = (Card.CardDeployment)photonEvent.CustomData;
             }

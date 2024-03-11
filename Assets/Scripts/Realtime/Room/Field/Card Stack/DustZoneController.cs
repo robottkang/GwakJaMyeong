@@ -6,7 +6,7 @@ using Card;
 
 namespace Room
 {
-    public class DustController : MonoBehaviour
+    public class DustZoneController : MonoBehaviour
     {
 #if UNITY_EDITOR
         [Button] private void ClearFieldTest() => ClearStrategyPlans();
