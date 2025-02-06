@@ -6,9 +6,10 @@ using DeckBuilding;
 
 namespace Card
 {
-    public class DeckBuildingCard : DragalbeCard
+    public class DeckBuildingCard : DragalbeCard, IPointerDownHandler, IPointerClickHandler
     {
         public bool addedToInventory = false;
+        private float timeToStartButtonDown = 0f;
 
         public override void OnBeginDrag(PointerEventData eventData)
         {
@@ -20,13 +21,31 @@ namespace Card
         {
             base.OnEndDrag(eventData);
 
-            if (!addedToInventory)
+            if (!addedToInventory) ComeBackToSpace();
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            timeToStartButtonDown = Time.time;
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (timeToStartButtonDown - 0.5f < Time.time && eventData.button == PointerEventData.InputButton.Left)
             {
-                Inventory.RemoveCard(gameObject);
-                transform.position = OriginParent.position;
-                transform.SetParent(OriginParent);
-                transform.GetComponent<RectTransform>().sizeDelta = transform.parent.GetComponent<RectTransform>().sizeDelta;
+                if (!addedToInventory)
+                    FindObjectOfType<Inventory>().OnDrop(eventData);
+                else
+                    ComeBackToSpace();
             }
+        }
+
+        private void ComeBackToSpace()
+        {
+            Inventory.RemoveCard(gameObject);
+            transform.position = OriginParent.position;
+            transform.SetParent(OriginParent);
+            transform.GetComponent<RectTransform>().sizeDelta = transform.parent.GetComponent<RectTransform>().sizeDelta;
         }
     }
 }

@@ -51,7 +51,8 @@ namespace Card
             }
             else
             {
-                transform.position = PrevPosition;
+                ObjectPool.ReturnObject("Hand Pool", gameObject);
+                HandManager.Instance.AddCard(CardData);
             }
         }
 

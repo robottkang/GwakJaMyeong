@@ -13,7 +13,7 @@ namespace Room
         [SerializeField]
         private GameObject handCardPrefab;
 
-        private const string handPoolName = "Hand Pool";
+        public const string handPoolName = "Hand Pool";
 
         private void Awake()
         {

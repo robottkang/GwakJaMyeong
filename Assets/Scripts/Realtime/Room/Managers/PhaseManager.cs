@@ -17,7 +17,6 @@ namespace Room
     {
         private static UniTask phaseChangingTask = new();
         private CancellationTokenSource cts = new();
-        private static UnityEvent onSecondCall = new();
         
         private static Phase currentPhase = Phase.BeforeStart;
         private static int turnCount = 1;
@@ -28,7 +27,6 @@ namespace Room
             set
             {
                 currentPhase = value;
-
 #if UNITY_EDITOR
                 Debug.Log($"--- Current Phase: {currentPhase} ---");
 #endif
@@ -58,13 +56,6 @@ namespace Room
 
         public static void ChangeNextPhase()
         {
-            if (phaseChangingTask.Status == UniTaskStatus.Pending)
-            {
-                onSecondCall.Invoke();
-                onSecondCall.RemoveAllListeners();
-                return;
-            }
-
             CurrentPhase = CurrentPhase switch
             {
                 Phase.BeforeStart => Phase.Launch,
@@ -117,7 +108,7 @@ namespace Room
 
             PlayerController.Instance.PostureCtrl.SelectPosture();
             await UniTask.WaitUntil(() => !PlayerController.Instance.PostureCtrl.IsPostureChanging, cancellationToken: token);
-            DuelManager.SwapActionToken();
+            DuelManager.TurnOverActionToken();
             await UniTask.WaitUntil(() => !OpponentController.Instance.PostureCtrl.IsPostureChanging, cancellationToken: token);
         }
         #endregion
@@ -138,7 +129,7 @@ namespace Room
         #region DuelPhase
         private async UniTask DuelPhase(CancellationToken token)
         {
-            await DuelManager.StartDuel();
+            await DuelManager.Instance.StartDuel();
             CurrentPhase = Phase.End;
         }
         #endregion

@@ -5,16 +5,14 @@ using UnityEngine;
 using Card.Types;
 using Room;
 using Card.Posture;
+using static Card.CardData;
 
 namespace Card
 {
     [CreateAssetMenu(fileName = "New CardData", menuName = "Card/CardData")]
-    [Serializable]
     public class CardData : ScriptableObject
     {
-        [SerializeField]
-        protected CardCode cardCode;
-        private readonly Dictionary<CardCode, ICardAction> cardTypes = new()
+        private static readonly Dictionary<CardCode, ICardAction> cardTypes = new()
         {
             { CardCode.Aufschtraechen, new Aufschtraechen() },
             { CardCode.Boudun, new Boudun() },
@@ -33,6 +31,8 @@ namespace Card
             { CardCode.Ochs_Attack, new Ochs_Attack() }
         };
         [SerializeField]
+        protected CardCode cardCode;
+        [SerializeField]
         protected Sprite cardSprite;
 
         [SerializeField]
@@ -49,7 +49,21 @@ namespace Card
         private string cardText;
 
         public CardCode ThisCardCode => cardCode;
-        public Sprite CardSprite => cardSprite;
+        public ICardAction CardType => cardTypes[ThisCardCode];
+        public Sprite CardSprite
+        {
+            get
+            {
+                if (cardSprite != null)
+                {
+                    return cardSprite;
+                }
+                else
+                {
+                    return AssetDatabase.Instance.CardSprites[ThisCardCode];
+                }
+            }
+        }
         public int Damage => damage;
         public AttackType Attack => attack;
         public AttackType GuardPoint => guardPoint;
@@ -57,11 +71,12 @@ namespace Card
         public PostureType FinishingPosture => finishingPosture;
         public string CardText => cardText;
 
-        public void Open(FieldController me, FieldController target) => cardTypes[cardCode].Open(me, target);
-        public void Turn(FieldController me, FieldController target) => cardTypes[cardCode].Turn(me, target);
-        public void SumStart(FieldController me, FieldController target) => cardTypes[cardCode].SumStart(me, target);
-        public void Sum(FieldController me, FieldController target) => cardTypes[cardCode].Sum(me, target);
-        public void SumEnd(FieldController me, FieldController target) => cardTypes[cardCode].SumEnd(me, target);
+        public void Open(FieldController target) => cardTypes[cardCode].Open(target, target.OpponentField);
+        public void Turn(FieldController target) => cardTypes[cardCode].Turn(target);
+        public void Disable(FieldController target) => cardTypes[cardCode].Disable(target);
+        public void SumStart(FieldController target) => cardTypes[cardCode].SumStart(target, target.OpponentField);
+        public void Sum(FieldController target) => cardTypes[cardCode].Sum(target, target.OpponentField);
+        public void SumEnd(FieldController target) => cardTypes[cardCode].SumEnd(target, target.OpponentField);
 
         [Flags, Serializable]
         public enum AttackType
@@ -117,20 +132,24 @@ namespace Card
         /// targetCard를 비활성화 시킨다.
         /// </summary>
         public void Disable(PlanCard targetCard);
-        public void Execute(PlanCard myCard, PlanCard opponentCard, FieldController myField, FieldController targetField);
-        public bool IsPostureVaild(PlanCard myCard);
+        public void Execute(PlanCard ownerCard, PlanCard targetCard, FieldController ownerField, FieldController targetField);
         /// <summary>
-        /// 상대 카드의 가드 포인트에 해당하는 유형의 카드와 합하고 있을 경우, targetCard를 무효화 시킵니다.
+        /// targetCard의 발동 자세가 유효한지 확인한다.
         /// </summary>
-        public bool CheckGarudPoint(PlanCard opponentCard, PlanCard targetCard);
+        public bool IsPostureVaild(PlanCard targetCard);
+        /// <summary>
+        /// 상대 카드의 가드 포인트에 해당하는 유형의 카드와 합하고 있을 경우, opponentCard를 무효화 시킵니다.
+        /// </summary>
+        public bool CheckGuardPoint(PlanCard guardCard, PlanCard opponentCard);
     }
 
     public interface ICardAction
     {
-        public void Open(FieldController me, FieldController opponent);
-        public void Turn(FieldController me, FieldController opponent);
-        public void SumStart(FieldController me, FieldController opponent);
-        public void Sum(FieldController me, FieldController opponent);
-        public void SumEnd(FieldController me, FieldController opponent);
+        public void Open(FieldController owner, FieldController opponet);
+        public void Turn(FieldController owner);
+        public void Disable(FieldController owner);
+        public void SumStart(FieldController owner, FieldController opponet);
+        public void Sum(FieldController owner, FieldController opponet);
+        public void SumEnd(FieldController owner, FieldController opponet);
     }
 }

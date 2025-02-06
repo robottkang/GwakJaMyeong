@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Card;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Room.Opponent
 {
@@ -13,7 +13,6 @@ namespace Room.Opponent
         private CardStackController deck;
         [SerializeField]
         private CardStackController dust;
-        private int planCardOrder = 0;
         public bool IsReadyToPlay { get; private set; } = false;
         public bool IsReadyPlanCard { get; set; } = false;
         public override FieldController OpponentField => PlayerController.Instance;
@@ -35,7 +34,7 @@ namespace Room.Opponent
                     dust.DrawCard(9);
                     deck.StackCard(9);
                 }
-                
+
                 deck.DrawCard(3);
             });
 
@@ -73,42 +72,59 @@ namespace Room.Opponent
             deck.DrawCard(deck.cardCount);
         }
 
-        public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged) { }
+        public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) { }
 
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps) { }
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) { }
 
         public void OnMasterClientSwitched(Player newMasterClient) { }
 
         public void OnEvent(EventData photonEvent)
         {
-            if (photonEvent.Code == (byte)DuelEventCode.Ready)
+            if (photonEvent.AreEventCodesEqual(DuelEventCode.Ready))
             {
-                IsReadyToPlay = (bool)photonEvent.CustomData;
+                IsReadyToPlay = photonEvent.ConvertEventData<bool>().content;
             }
 
-            if (photonEvent.Code == (byte)DuelEventCode.SendCardsData && PhaseManager.CurrentPhase == Phase.StrategyPlan)
+            if (photonEvent.AreEventCodesEqual(DuelEventCode.SendCardData) && PhaseManager.CurrentPhase == Phase.StrategyPlan)
             {
-                Card.CardData cardData = ScriptableObject.CreateInstance<Card.CardData>();
-                JsonUtility.FromJsonOverwrite((string)photonEvent.CustomData, cardData);
-                Debug.Log($" Receive {(string)photonEvent.CustomData}");
+                List<CardData.CardCode> cardCodeList = photonEvent.ConvertEventData<List<CardData.CardCode>>().content;
+                Debug.Log($"Receive {cardCodeList[0]}, {cardCodeList[1]}, {cardCodeList[2]}");
 
-                GameObject planCardObj = ObjectPool.GetObject("Card Pool");
-                planCardObj.GetComponent<Card.PlanCard>().Initialize(cardData, this);
-                planCardObj.transform.rotation = Quaternion.Euler(0, 0, 180f);
-                planCardObj.GetComponent<Card.PlanCard>().CanMove = false;
-                StrategyPlans[planCardOrder].PlaceCard(planCardObj);
-
-                planCardOrder += 1;
-                if (planCardOrder == 3)
+                for (int i = 0; i < cardCodeList.Count; i++)
                 {
-                    IsReadyPlanCard = true;
-                    planCardOrder = 0;
+                    GameObject planCardObj = ObjectPool.GetObject("Card Pool");
+                    planCardObj.GetComponent<PlanCard>().Initialize(cardCodeList[i], this);
+                    planCardObj.transform.rotation = Quaternion.Euler(0, 0, 180f);
+                    planCardObj.GetComponent<PlanCard>().CanMove = false;
+                    StrategyPlans[i].PlaceCard(planCardObj);
                 }
+
+                IsReadyPlanCard = true;
             }
 
-            if (photonEvent.Code == (byte)DuelEventCode.SetCardDepolyment)
+            if (photonEvent.AreEventCodesEqual(DuelEventCode.SetCardDepolyment))
             {
-                CurrentCard.CurrentCardDeployment = (Card.CardDeployment)photonEvent.CustomData;
+                var data = photonEvent.ConvertEventData<CardDeployment>();
+
+                if (data.TargetUser == UserType.Opponent)
+                {
+                    CurrentCard.CurrentDeployment = data.content;
+
+                    switch (CurrentCard.CurrentDeployment)
+                    {
+                        case CardDeployment.Opened:
+                            CurrentCard.Open();
+                            break;
+                        case CardDeployment.Turned:
+                            CurrentCard.Turn();
+                            break;
+                        case CardDeployment.Disabled:
+                            CurrentCard.Disable();
+                            break;
+                        default:
+                            throw new System.NotImplementedException();
+                    }
+                }
             }
         }
     }

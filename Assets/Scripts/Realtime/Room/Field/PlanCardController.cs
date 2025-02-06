@@ -20,7 +20,6 @@ namespace Room
         [SerializeField]
         private GameObject disabling;
         private bool isSelecting = false;
-        private bool selectsDeployment = false;
         private StrategyPlan CurrentStrategyPlan => PlayerController.Instance.StrategyPlans[DuelManager.StrategyPlanOrder];
         public bool IsSelecting => isSelecting;
         public bool CanOpen => opening.activeSelf;
@@ -33,27 +32,40 @@ namespace Room
 
         private void Update()
         {
-            if (isSelecting && !selectsDeployment && Input.GetMouseButtonUp(0))
+            HandlePlanCard();
+        }
+
+        private void HandlePlanCard()
+        {
+            if (isSelecting && Input.GetMouseButtonUp(0))
             {
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo);
 
-                bool isDisabled = CurrentStrategyPlan.FirstPlacedPlanCard.onCardOpen == null;
-                CardDeployment deployment = (hitInfo.point.z - transform.position.z) switch
-                {
-                    >= 0f when !isDisabled && CanOpen => CardDeployment.Opened,
-                    < 0f  when !isDisabled && CanTurn => CardDeployment.Turned,
-                    _ => CardDeployment.Disabled,
-                };
-                ChangeDeployment(CurrentStrategyPlan.FirstPlacedPlanCard, deployment);
-                selectsDeployment = true;
+                PlanCard planCard = CurrentStrategyPlan.FirstPlacedPlanCard;
+                float angle = Vector3.SignedAngle(Vector3.forward, hitInfo.point - transform.position, Vector3.up);
 
-                UniTask.Void(async () =>
+                // forwards, Open
+                if (angle <= 90f && angle >= -90f && !planCard.Disabled && CanOpen)
                 {
-                    await UniTask.WaitUntil(() => !FieldController.IsChangingAnyPosture);
-                    isSelecting = false;
-                    InactivateOptions();
-                    DuelManager.SwapActionToken();
-                });
+                    planCard.Open();
+                    SendDeployment(planCard, CardDeployment.Opened);
+                }
+                // backwards, Turn
+                else if ((angle > 90f || angle < -90f) && !planCard.Disabled && CanTurn)
+                {
+                    planCard.Turn();
+                    SendDeployment(planCard, CardDeployment.Turned);
+                }
+                // Disable
+                else
+                {
+                    planCard.Disable();
+                    SendDeployment(planCard, CardDeployment.Disabled);
+                }
+
+                isSelecting = false;
+                InactivateOptions();
+
                 Debug.Log("Complete to select");
             }
         }
@@ -65,35 +77,40 @@ namespace Room
         public void SelectDeployment(PlanCard planCard)
         {
             isSelecting = true;
-            selectsDeployment = false;
             transform.position = planCard.CurrentStrategyPlan.transform.position;
             ActivateOptions(planCard);
         }
 
-        private void ChangeDeployment(PlanCard target, CardDeployment deployment)
+        private void SendDeployment(PlanCard target, CardDeployment deployment)
         {
-            target.CurrentCardDeployment = deployment;
+            target.CurrentDeployment = deployment;
 
-            PhotonNetwork.RaiseEvent(
-                (byte)DuelEventCode.SetCardDepolyment,
-                (int)deployment,
-                RaiseEventOptions.Default,
-                SendOptions.SendReliable);
+            new RaiseEventData<CardDeployment>(UserType.Player, deployment).RaiseDuelEvent(DuelEventCode.SetCardDepolyment);
+            //PhotonNetwork.RaiseEvent((byte)DuelEventCode.SetCardDepolyment,
+            //    JsonUtility.ToJson(new RaiseEventData(UserType.Player, (int)deployment)),
+            //    RaiseEventOptions.Default,
+            //    SendOptions.SendReliable);
         }
 
         private void ActivateOptions(PlanCard planCard)
         {
-            if (planCard.CardData.RequiredPosture.HasFlag(PlayerController.Instance.PostureCtrl.CurrentPosture))
+            if (planCard.Disabled)
             {
-                if (planCard.onCardOpen != null) opening.SetActive(true);
-                else disabling.SetActive(true);
-            }
-            else
-            {
-                if (planCard.onCardTurn == null) disabling.SetActive(true);
+                disabling.SetActive(true);
+                return;
             }
 
-            if (planCard.onCardTurn != null) turning.SetActive(true);
+            if (planCard.CardData.RequiredPosture.HasFlag(PlayerController.Instance.PostureCtrl.CurrentPosture))
+            {
+                opening.SetActive(true);
+            }
+            else if (!planCard.CanTurn)
+            {
+                disabling.SetActive(true);
+            }
+
+            if (planCard.CanTurn)
+                turning.SetActive(true);
         }
 
         private void InactivateOptions()

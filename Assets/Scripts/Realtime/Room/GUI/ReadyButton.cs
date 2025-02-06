@@ -23,8 +23,6 @@ namespace Room.UI
 
         private void Awake()
         {
-            PhotonNetwork.AddCallbackTarget(this);
-
             PhaseEventBus.Subscribe(Phase.Launch, () => DisappearButton(cts.Token).Forget());
         }
 
@@ -55,8 +53,6 @@ namespace Room.UI
 
         private void OnDestroy()
         {
-            PhotonNetwork.RemoveCallbackTarget(this);
-
             cts.Cancel();
             cts.Dispose();
         }
@@ -68,10 +64,11 @@ namespace Room.UI
                 readyButton.interactable = false;
 
                 RoomManager.IsReadyToPlay ^= true;
-                bool failedToSend = !PhotonNetwork.RaiseEvent((byte)DuelEventCode.Ready,
-                    true,
-                    RaiseEventOptions.Default,
-                    SendOptions.SendReliable);
+                bool failedToSend = !new RaiseEventData<bool>(UserType.Opponent, true).RaiseDuelEvent(DuelEventCode.Ready);
+                    //!PhotonNetwork.RaiseEvent((byte)DuelEventCode.Ready,
+                    //true,
+                    //RaiseEventOptions.Default,
+                    //SendOptions.SendReliable);
                 if (failedToSend)
                     throw new Exception("Failed to send ready event");
 
@@ -85,6 +82,10 @@ namespace Room.UI
             catch (Exception) when (GameManager.Instance.EnabledDebug)
             {
                 PhaseManager.ChangeNextPhase();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
 
@@ -115,7 +116,7 @@ namespace Room.UI
 
         public void OnEvent(EventData photonEvent)
         {
-            if (photonEvent.Code == (byte)DuelEventCode.Ready)
+            if (photonEvent.AreEventCodesEqual(DuelEventCode.Ready))
             {
                 RoomManager.IsReadyToPlay ^= true;
             }

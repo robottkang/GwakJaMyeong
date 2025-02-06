@@ -35,34 +35,21 @@ namespace Room.UI
 
         public void TrySendPlanCards()
         {
-            Card.CardData[] cardsData = new Card.CardData[3];
-
             for (int i = 0; i < 3; i++)
             {
                 Card.PlanCard planCard;
                 if ((planCard = PlayerController.Instance.GetCard(i)) == null)
                 {
-                    Debug.Log("Not all cards are placed");
                     transform.position = originPosition;
                     transform.DOShakePosition(0.4f, 3f, 10, 90f, false, true);
                     image.DOColor(Color.red, 0.2f)
                         .OnComplete(() => image.DOColor(Color.white, 0.5f));
                     return;
                 }
-                cardsData[i] = planCard.CardData;
             }
 
-            foreach (var card in cardsData)
-            {
-                Debug.Log($"Send card: " + card.ThisCardCode.ToString());
-                
-                PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendCardsData,
-                    JsonUtility.ToJson(card),
-                    RaiseEventOptions.Default,
-                    SendOptions.SendReliable);
-            }
+            PlayerController.Instance.SendPlanCards();
 
-            PlayerController.Instance.IsReadyPlanCard = true;
             canvasGroup.DOFade(0f, 0.5f)
                 .OnComplete(() => gameObject.SetActive(false));
         }

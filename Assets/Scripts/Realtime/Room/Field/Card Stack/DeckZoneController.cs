@@ -34,7 +34,7 @@ namespace Room
 
         private void Start()
         {
-            SetDeck(deckList);
+            SetDeck(Shuffle(deckList));
 
             cardStackController.OnDrawCard.AddListener(() =>
             {

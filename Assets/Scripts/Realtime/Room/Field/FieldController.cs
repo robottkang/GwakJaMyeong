@@ -33,13 +33,13 @@ namespace Room
             strategyPlans[DuelManager.StrategyPlanOrder].PlaceCard(planCard);
         }
 
-        public virtual void TakeDamage(int damage)
+        public virtual void ApplyDamage(int damage)
         {
             hp -= damage;
 
             if (hp <= 0)
             {
-                DuelManager.EndGame(this);
+                DuelManager.Instance.EndGame(this);
             }
         }
     }

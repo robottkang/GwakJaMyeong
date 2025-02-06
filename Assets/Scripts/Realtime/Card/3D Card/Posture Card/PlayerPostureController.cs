@@ -12,24 +12,13 @@ namespace Room
 {
     public class PlayerPostureController : PostureController, IOnEventCallback
     {
-        private Camera mainCamera;
         [Header("- Posture Objects")]
         [SerializeField]
         private PostureInfo[] postureInfos = new PostureInfo[4];
 
-        private void Awake()
-        {
-            PhotonNetwork.AddCallbackTarget(this);
-        }
-
         private void Start()
         {
             Initialize();
-        }
-
-        private void OnDestroy()
-        {
-            PhotonNetwork.RemoveCallbackTarget(this);
         }
 
         // change the posture's data and transform depending on the mouse position when on mouse up
@@ -37,7 +26,7 @@ namespace Room
         {
             if (!(Input.GetMouseButtonUp(0) && isPostureChanging)) return;
 
-            Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit mouseRaycastHit, Mathf.Infinity, LayerMask.GetMask("Board"));
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit mouseRaycastHit, Mathf.Infinity, LayerMask.GetMask("Board"));
 
             Vector3 v = mouseRaycastHit.point - transform.position;
             const float minDistanceToChangePosture = 1f;
@@ -68,24 +57,17 @@ namespace Room
         {
             SetPosture(posture);
 
-            PhotonNetwork.RaiseEvent(
-                (byte)DuelEventCode.SendPosture,
-                JsonUtility.ToJson(new PostureEventData()
-                {
-                    changer = UserType.Player,
-                    posture = postureCard.CurrentPosture
-                }),
+            new RaiseEventData<PostureType>(UserType.Player, postureCard.CurrentPosture).RaiseDuelEvent(DuelEventCode.SendPosture);
+            /*PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendPosture,
+                JsonUtility.ToJson(new RaiseEventData(UserType.Opponent, postureCard.CurrentPosture)),
                 RaiseEventOptions.Default,
-                SendOptions.SendReliable);
+                SendOptions.SendReliable);*/
 
             if (PhaseManager.CurrentPhase != Phase.Duel) return;
 
-            if (posture == PostureType.Ochs && PlayerController.Instance.CurrentCard.CurrentCardDeployment == CardDeployment.Turned)
+            if (posture == PostureType.Ochs && PlayerController.Instance.CurrentCard.CurrentDeployment == CardDeployment.Turned)
             {
-                GameObject ochsCard = ObjectPool.GetObject("Card Pool");
-                ochsCard.GetComponent<PlanCard>().Initialize(ochs_attack, PlayerController.Instance);
-                PlayerController.Instance.PlaceCard(ochsCard);
-                ochsCard.GetComponent<PlanCard>().CurrentCardDeployment = CardDeployment.Turned;
+                PlaceOchs_acttack(PlayerController.Instance);
             }
         }
 
@@ -128,19 +110,17 @@ namespace Room
 
         private void Initialize()
         {
-            mainCamera = Camera.main;
-
             InactivatePostureInfos();
         }
 
         public void OnEvent(EventData photonEvent)
         {
-            if (photonEvent.Code == (byte)DuelEventCode.SendPosture)
+            if (photonEvent.AreEventCodesEqual(DuelEventCode.SendPosture))
             {
-                var data = JsonUtility.FromJson<PostureEventData>((string)photonEvent.CustomData);
+                var data = photonEvent.ConvertEventData<PostureType>();
 
-                if (data.changer == UserType.Opponent)
-                    SetPosture(data.posture);
+                if (data.TargetUser == UserType.Player)
+                    SetPosture(data.content);
             }
         }
 

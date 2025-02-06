@@ -1,24 +1,31 @@
 using Card;
 using Card.Posture;
+using Cysharp.Threading.Tasks;
 using Room.Opponent;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Card.CardData;
 using EasyButton = EasyButtons.ButtonAttribute;
 
 namespace Room.Diagnostics
 {
     public class RoomDebugController : MonoBehaviour
     {
+        [Header("- ChangePhase")]
         [SerializeField] private Phase targetPhase = Phase.BeforeStart;
-        [Space]
+        [Header("- SetMyDeck")]
         [SerializeField] private bool shuffleMyDeck = true;
         [SerializeField] private List<CardData> myDeck = new();
-        [Space]
-        [SerializeField] private UserType playerActionToken = UserType.Player;
+        [Header("- SetActionToken")]
+        [SerializeField] private UserType targetActionToken = UserType.Player;
+        [Header("- ChangeOpponentPosture")]
         [SerializeField] private PostureType opponentPosture = PostureType.None;
+        [Header("- SetOpponentStrategyPlans")]
         [SerializeField] private List<CardData> opponentStrategyPlans = new();
+        [Header("- ControlOpponentPlanCard")]
+        [SerializeField] private CardDeployment targetDeployment = CardDeployment.Placed;
 
         [EasyButton(Mode = EasyButtons.ButtonMode.EnabledInPlayMode)]
         private void Test(TestMethod method)
@@ -39,6 +46,9 @@ namespace Room.Diagnostics
                     break;
                 case TestMethod.SetOpponentStrategyPlans:
                     SetOpponentStrategyPlans();
+                    break;
+                case TestMethod.ControlOpponentPlanCard:
+                    ControlOpponentPlanCard();
                     break;
                 default:
                     throw new NotImplementedException();
@@ -68,7 +78,7 @@ namespace Room.Diagnostics
 
         private void SetActionToken()
         {
-            DuelManager.SetPlayerActionToken(playerActionToken);
+            DuelManager.SetPlayerActionToken(targetActionToken);
         }
 
         private void ChangePhase()
@@ -78,19 +88,51 @@ namespace Room.Diagnostics
 
         private void ChangeOpponentPosture()
         {
-            FindObjectOfType<OpponentController>().PostureCtrl.ChangePosture(opponentPosture);
+            var eventData = new ExitGames.Client.Photon.EventData() { Code = (byte)DuelEventCode.SendPosture };
+            eventData.Parameters[Photon.Realtime.ParameterCode.Data] = JsonUtility.ToJson(new RaiseEventData<PostureType>(UserType.Player, opponentPosture));
+
+            (FindObjectOfType<OpponentController>().PostureCtrl as OpponentPostureController).OnEvent(eventData);
         }
 
         private void SetOpponentStrategyPlans()
         {
-            for (int i = 0; i < 3; i++)
-            {
-                var eventData = new ExitGames.Client.Photon.EventData() { Code = (byte)DuelEventCode.SendCardsData };
-                eventData.Parameters[Photon.Realtime.ParameterCode.Data] = JsonUtility.ToJson(opponentStrategyPlans[i]);
-                eventData.Parameters[Photon.Realtime.ParameterCode.ActorNr] = 1;
+            var cardCodes = new List<CardData.CardCode>() {
+                opponentStrategyPlans[0].ThisCardCode,
+                opponentStrategyPlans[1].ThisCardCode,
+                opponentStrategyPlans[2].ThisCardCode
+            };
 
-                FindObjectOfType<OpponentController>().OnEvent(eventData);
+            var eventData = new ExitGames.Client.Photon.EventData() { Code = (byte)DuelEventCode.SendCardData };
+            eventData.Parameters[Photon.Realtime.ParameterCode.Data] = JsonUtility.ToJson(new RaiseEventData<List<CardData.CardCode>>(UserType.Opponent, cardCodes));
+            eventData.Parameters[Photon.Realtime.ParameterCode.ActorNr] = 1;
+
+            FindObjectOfType<OpponentController>().OnEvent(eventData);
+        }
+
+        private void ControlOpponentPlanCard()
+        {
+            switch (targetDeployment)
+            {
+                case CardDeployment.Placed:
+                    OpponentController.Instance.CurrentCard.CurrentDeployment = CardDeployment.Placed;
+                    break;
+                case CardDeployment.Opened:
+                    OpponentController.Instance.CurrentCard.Open();
+                    break;
+                case CardDeployment.Turned:
+                    OpponentController.Instance.CurrentCard.Turn();
+                    break;
+                case CardDeployment.Disabled:
+                    OpponentController.Instance.CurrentCard.CurrentDeployment = CardDeployment.Disabled;
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
+            DuelManager.TurnOverActionToken();
+
+            var eventData = new ExitGames.Client.Photon.EventData() { Code = (byte)DuelEventCode.CompleteCardAction };
+            eventData.Parameters[Photon.Realtime.ParameterCode.ActorNr] = 1;
+            DuelManager.Instance.OnEvent(eventData);
         }
 
         private enum TestMethod
@@ -99,7 +141,8 @@ namespace Room.Diagnostics
             SetMyDeck,
             SetActionToken,
             ChangeOpponentPosture,
-            SetOpponentStrategyPlans
+            SetOpponentStrategyPlans,
+            ControlOpponentPlanCard,
         }
     }
 }

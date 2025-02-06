@@ -10,7 +10,8 @@ namespace DeckBuilding
     {
         private static List<GameObject> content = new();
         public static GameObject[] Content => content.ToArray();
-        [SerializeField] private int maxCardCount = 11;
+        [SerializeField]
+        private int maxCardCount = 11;
 
         private void Awake()
         {

@@ -32,14 +32,11 @@ namespace Room.Opponent
         {
             SetPosture(posture);
 
-            PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendPosture,
-                JsonUtility.ToJson(new PostureEventData()
-                {
-                    changer = UserType.Opponent,
-                    posture = posture
-                }),
-                RaiseEventOptions.Default,
-                SendOptions.SendReliable);
+            new RaiseEventData<PostureType>(UserType.Opponent, posture).RaiseDuelEvent(DuelEventCode.SendPosture);
+            //PhotonNetwork.RaiseEvent((byte)DuelEventCode.SendPosture,
+            //    JsonUtility.ToJson(new RaiseEventData(UserType.Opponent, posture)),
+            //    RaiseEventOptions.Default,
+            //    SendOptions.SendReliable);
         }
 
         public override void SelectPosture(PostureType availablePosture = (PostureType)(-1))
@@ -55,21 +52,18 @@ namespace Room.Opponent
         // Receive Opponent's Posture Change event
         public void OnEvent(EventData photonEvent)
         {
-            if (photonEvent.Code == (byte)DuelEventCode.SendPosture)
+            if (photonEvent.AreEventCodesEqual(DuelEventCode.SendPosture))
             {
-                var data = JsonUtility.FromJson<PostureEventData>((string)photonEvent.CustomData);
+                var data = photonEvent.ConvertEventData<PostureType>();
 
-                if (data.changer == UserType.Player)
+                if (data.TargetUser == UserType.Opponent)
                 {
-                    SetPosture(data.posture);
+                    SetPosture(data.content);
 
                     if (PhaseManager.CurrentPhase != Phase.Duel) return;
-                    if (data.posture == PostureType.Ochs && OpponentController.Instance.CurrentCard.CurrentCardDeployment == CardDeployment.Turned)
+                    if (data.content == PostureType.Ochs && OpponentController.Instance.CurrentCard.CurrentDeployment == CardDeployment.Turned)
                     {
-                        PlanCard ochsCard = ObjectPool.GetObject("Card Pool").GetComponent<PlanCard>();
-                        ochsCard.Initialize(ochs_attack, OpponentController.Instance);
-                        OpponentController.Instance.PlaceCard(ochsCard.gameObject);
-                        ochsCard.CurrentCardDeployment = CardDeployment.Turned;
+                        PlaceOchs_acttack(OpponentController.Instance);
                     }
                 }
             }

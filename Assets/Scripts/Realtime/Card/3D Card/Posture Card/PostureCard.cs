@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using Room;
 
 namespace Card.Posture
 {
@@ -54,12 +53,5 @@ namespace Card.Posture
         /// 뒤
         /// </summary>
         Alber = 8,
-    }
-
-    [Serializable]
-    public class PostureEventData
-    {
-        public UserType changer;
-        public PostureType posture;
     }
 }
